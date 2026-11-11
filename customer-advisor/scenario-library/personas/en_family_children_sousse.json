@@ -1,0 +1,17 @@
+{
+  "name": "EN 1 - Family with 2 children in Sousse",
+  "language": "en",
+  "opening": "Hello, we are a family of four looking for a hotel in Sousse.",
+  "opening_covers": ["destination"],
+  "answers": {
+    "hotel_choice": "Please recommend some family-friendly hotels.",
+    "dates": "From 11/12/2026 to 14/12/2026.",
+    "adults": "2 adults and 2 children.",
+    "children": "The children are 5 and 9 years old.",
+    "board": "All inclusive please.",
+    "budget": "Around 1500 dinars."
+  },
+  "follow_ups": ["Which one is the cheapest?"],
+  "decline_contact": "Thanks, I'll discuss it with my wife and come back to you.",
+  "closing": "Thank you, goodbye."
+}

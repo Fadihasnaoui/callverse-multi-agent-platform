@@ -1,0 +1,126 @@
+.page { max-width: 1100px; margin: 0 auto; }
+
+.header { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; margin-bottom: 1.5rem; }
+.header h1 { font-size: 1.8rem; letter-spacing: -.03em; margin: .2rem 0; color: var(--text-heading, #172033); }
+.eyebrow { color: var(--accent, #6c5ce7); font-size: .68rem; font-weight: 800; letter-spacing: .14em; }
+.subtitle { color: var(--text-muted); font-size: .85rem; }
+.controls { display: flex; gap: .6rem; align-items: center; }
+.pdfBtn { padding: .5rem .85rem; border-radius: 8px; background: var(--bg-raised, #f8f9fc); border: 1px solid var(--border); color: var(--text-secondary, #4d5669); font-size: .78rem; font-weight: 700; }
+.pdfBtn:hover { background: var(--border); }
+.message { padding: .7rem; background: color-mix(in srgb, var(--success) 15%, var(--bg-card)); border-radius: 10px; margin-bottom: 1rem; color: var(--text); }
+
+section h2 { font-size: 1rem; font-weight: 800; color: var(--accent, #6c5ce7); margin: 1.5rem 0 .75rem; padding-bottom: .4rem; border-bottom: 1px solid var(--border-light, #edf0f5); }
+
+/* Health banner */
+.healthBanner { display: flex; gap: 2rem; align-items: center; padding: 1.25rem; border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card); box-shadow: var(--shadow-card, 0 8px 24px rgba(24,34,62,.06)); margin-bottom: 1rem; }
+.healthMain { display: flex; align-items: center; gap: 1rem; min-width: 220px; }
+.healthRing { width: 72px; height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; border: 4px solid var(--accent, #6c5ce7); background: var(--accent-bg, #f1efff); flex-shrink: 0; }
+.healthRing strong { font-size: 1.5rem; line-height: 1; color: var(--accent, #6c5ce7); }
+.healthRing span { font-size: .55rem; color: var(--text-muted); }
+.healthTitle { font-size: 1.1rem !important; margin: 0 !important; padding: 0 !important; border: none !important; color: var(--text-heading) !important; }
+.healthVerdict { font-size: .78rem; color: var(--text-muted); margin-top: .2rem; }
+.healthBreakdown { flex: 1; display: flex; flex-direction: column; gap: .5rem; }
+.healthBarRow { display: flex; align-items: center; gap: .6rem; }
+.healthBarRow span { width: 110px; font-size: .7rem; color: var(--text-muted); }
+.healthBarTrack { flex: 1; height: 8px; background: var(--bg-inset, #f0f1f5); border-radius: 4px; overflow: hidden; }
+.healthBarTrack > div { height: 100%; border-radius: 4px; transition: width .4s; }
+.healthBarRow strong { width: 28px; font-size: .78rem; text-align: right; color: var(--text-heading); }
+
+/* KPIs */
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: .75rem; margin-bottom: 1rem; }
+.kpiTile { padding: .9rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
+.kpiTile span { display: block; font-size: .65rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.kpiTile strong { display: block; font-size: 1.4rem; letter-spacing: -.03em; margin: .3rem 0 .1rem; color: var(--text-heading); }
+.kpiTile small { font-size: .62rem; color: var(--text-faint); }
+
+/* Strategist */
+.stratSection h2 { margin-top: 1rem; }
+.stratCard { padding: 1.1rem; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); box-shadow: var(--shadow-card); }
+.stratReasoning { padding: .75rem; border-radius: 10px; background: var(--accent-bg, #f1efff); color: var(--accent-text, #3b356d); font-size: .8rem; line-height: 1.5; margin-bottom: .75rem; }
+.stratTiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin-bottom: .75rem; }
+.stratTiles > div { text-align: center; padding: .55rem .3rem; border-radius: 10px; background: var(--bg-raised, #f8f9fc); }
+.stratTiles span { display: block; font-size: .55rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .03em; margin-bottom: .2rem; }
+.stratTiles strong { display: block; font-size: .78rem; text-transform: capitalize; color: var(--text-heading); }
+.playbook { padding: .6rem .8rem; border-radius: 8px; background: var(--bg-raised, #f8f9fc); border-left: 3px solid var(--accent, #6c5ce7); }
+.playbook > strong { display: block; font-size: .68rem; color: var(--text-heading); margin-bottom: .3rem; }
+.playbook p { font-size: .65rem; color: var(--text-secondary); margin: .15rem 0; }
+.playbook p span { font-weight: 600; text-transform: capitalize; }
+
+/* Brief */
+.briefText { white-space: pre-wrap; font-family: inherit; font-size: .75rem; line-height: 1.6; color: var(--text-secondary); padding: .9rem; border-radius: 10px; background: var(--bg-raised, #f8f9fc); border-left: 3px solid var(--accent, #6c5ce7); }
+
+/* Gap analysis */
+.gapGrid { display: flex; gap: .75rem; margin-bottom: 1rem; }
+.gapTile { flex: 1; padding: .8rem; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-light); }
+.gapHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+.gapHeader strong { font-size: .85rem; text-transform: capitalize; color: var(--text-heading); }
+.gapHeader span { font-size: .65rem; font-weight: 700; }
+.excess { color: #d89113; }
+.deficit { color: #e76f51; }
+.onTrack { color: #159f77; }
+.gapBar { position: relative; height: 8px; background: var(--bg-inset, #f0f1f5); border-radius: 4px; overflow: visible; margin-bottom: .4rem; }
+.gapFill { height: 100%; background: var(--accent, #6c5ce7); border-radius: 4px; }
+.gapTarget { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text-heading); border-radius: 1px; }
+.gapTile p { font-size: .6rem; color: var(--text-faint); }
+
+/* Data table */
+.dataTable { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+.dataTable th { text-align: start; padding: .5rem .6rem; font-size: .65rem; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; border-bottom: 2px solid var(--border-light); }
+.dataTable td { padding: .5rem .6rem; border-bottom: 1px solid var(--border-light); font-size: .78rem; color: var(--text-secondary); }
+.dataTable td strong { color: var(--accent, #6c5ce7); }
+.platform { text-transform: capitalize; font-weight: 600; color: var(--text-heading) !important; }
+.captionCell { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Learning */
+.learningSection h2 { margin-top: 1rem; }
+.learningCard { padding: 1rem; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); }
+.learningHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; }
+.learningHeader strong { font-size: .9rem; color: var(--text-heading); }
+.learningHeader p { font-size: .7rem; color: var(--text-muted); }
+.learningPct { font-size: 1.4rem; font-weight: 900; color: var(--accent, #6c5ce7); }
+.progressBar { height: 8px; background: var(--bg-inset, #f0f1f5); border-radius: 6px; overflow: hidden; margin-bottom: .6rem; }
+.progressBar > div { height: 100%; background: linear-gradient(90deg, var(--primary, #4361ee), var(--success, #2ec4b6)); border-radius: 6px; }
+.learningNote { font-size: .72rem; color: var(--text-muted); }
+
+/* Recommendations */
+.recGrid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.recItem { display: flex; gap: .7rem; padding: .8rem; border-radius: 10px; background: var(--accent-bg, #f1efff); }
+.recNum { color: var(--accent, #6c5ce7); font-weight: 900; font-size: .7rem; flex-shrink: 0; }
+.recItem p { font-size: .75rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* Insight */
+.insightBox { padding: 1rem; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-light); margin: 1rem 0; }
+.insightLabel { display: block; font-size: .65rem; font-weight: 800; color: var(--accent, #6c5ce7); letter-spacing: .12em; margin-bottom: .4rem; }
+.insightBox p { font-size: .82rem; line-height: 1.6; color: var(--text-secondary); }
+
+/* Sentiment */
+.sentimentGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .6rem; margin-bottom: .75rem; }
+.sentimentTile { text-align: center; padding: .7rem .3rem; border-radius: 10px; background: var(--bg-raised, #f8f9fc); border: 1px solid var(--border-light); }
+.sentimentTile span { display: block; font-size: .6rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .2rem; }
+.sentimentTile strong { font-size: 1.3rem; color: var(--text-heading); }
+.sentPositive { color: #159f77 !important; }
+.sentNegative { color: #e76f51 !important; }
+.topicRow { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; margin-bottom: .75rem; }
+.topicRow strong { font-size: .7rem; color: var(--text-heading); margin-right: .3rem; }
+.topicChip { padding: .18rem .45rem; border-radius: 999px; background: var(--accent-bg, #f1efff); color: var(--accent-text, #3b356d); font-size: .65rem; font-weight: 600; }
+
+/* Self-benchmark */
+.benchPeriodLabel { font-size: .65rem; color: var(--text-muted); margin-bottom: .6rem; }
+.benchCompare { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; margin-bottom: .75rem; }
+.benchCompareTile { text-align: center; padding: .6rem .3rem; border-radius: 10px; background: var(--bg-raised, #f8f9fc); border: 1px solid var(--border-light); }
+.benchCompareTile span:first-child { display: block; font-size: .55rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .03em; margin-bottom: .15rem; }
+.benchCompareTile strong { display: block; font-size: 1.1rem; color: var(--text-heading); }
+.benchCompareTile small { display: block; font-size: .55rem; color: var(--text-muted); }
+.benchInsightBox { padding: .6rem .8rem; border-radius: 8px; background: var(--accent-bg, #f1efff); border-left: 3px solid var(--accent, #6c5ce7); margin-bottom: 1rem; }
+.benchInsightBox p { font-size: .72rem; color: var(--accent-text, #3b356d); margin: .15rem 0; line-height: 1.5; }
+
+@media (max-width: 850px) {
+  .header { flex-direction: column; align-items: flex-start; }
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .healthBanner { flex-direction: column; }
+  .stratTiles { grid-template-columns: repeat(3, 1fr); }
+  .gapGrid { flex-direction: column; }
+  .recGrid { grid-template-columns: 1fr; }
+  .sentimentGrid { grid-template-columns: repeat(2, 1fr); }
+  .benchCompare { grid-template-columns: repeat(2, 1fr); }
+}

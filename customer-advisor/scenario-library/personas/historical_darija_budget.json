@@ -1,0 +1,21 @@
+{
+  "name": "Darija - duration correction and budget request",
+  "language": "aeb-Latn",
+  "opening": "Slm, chhel li prix Hotel Riadh Palm Sousse pour 1 personne a partir du 21/11/2026 pour 3 nuits ?",
+  "opening_covers": ["destination", "adults", "dates"],
+  "answers": {
+    "hotel_choice": "Hotel Riadh Palm Sousse.",
+    "dates": "A partir du 21/11/2026 pour 3 nuits.",
+    "adults": "1 personne.",
+    "children": "Ma3andich sghar.",
+    "board": "All Soft.",
+    "budget": "Matnjmich thsbhalna be 700 dinar ?"
+  },
+  "follow_ups": [
+    "Ou 4 nutis a partir du 21 novembre ?",
+    "Matnjmich thsbhalna be 700 dinar ?",
+    "El taxe mte3 l hotel incluse walla le ?"
+  ],
+  "decline_contact": "Barcha mer9i, taw nkhamem w nrja3lek.",
+  "closing": "Ya3tik essa7a, bislema."
+}

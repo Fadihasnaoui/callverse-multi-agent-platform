@@ -1,0 +1,15 @@
+.page { min-height: 100vh; background: radial-gradient(circle at 88% 0%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 32%), var(--bg); }
+.shell { max-width: 1440px; margin: 0 auto; padding: 1.75rem max(3%, 1rem) 2.5rem; }
+.hero { position: relative; display:flex; justify-content:space-between; gap:2rem; align-items:end; overflow:hidden; padding:2.45rem 2.6rem; border:1px solid #39535c; border-radius:24px 24px 0 0; color:#fff; background:radial-gradient(circle at 88% 20%, #7164bd 0, transparent 32%), radial-gradient(circle at 76% 115%, #2d6661 0, transparent 52%), linear-gradient(120deg,#14333d,#263263); }
+.hero::after { content:""; position:absolute; inset:auto -4rem -8rem auto; width:260px; aspect-ratio:1; border:1px solid #f4f7ff23; border-radius:50%; box-shadow:0 0 0 40px #f4f7ff09, 0 0 0 80px #f4f7ff06; }
+.heroCopy,.heroStatus { position:relative; z-index:1; }
+.hero p { margin:0 0 .7rem; color:#c8c2fb; font-size:.62rem; font-weight:800; letter-spacing:.15em; }
+.hero h1 { margin:0; font-size:clamp(1.8rem,3vw,2.45rem); letter-spacing:-.05em; }
+.hero span { display:block; max-width:700px; margin-top:.75rem; color:#d6e4e2; font-size:.9rem; line-height:1.65; }
+.heroStatus { display:inline-flex; align-items:center; gap:.55rem; flex:none; padding:.55rem .8rem; border:1px solid #ffffff24; border-radius:99px; background:#0f1d2b38; color:#effbf3; font-size:.72rem; white-space:nowrap; }
+.heroStatus i { width:7px; height:7px; border-radius:50%; background:#8fe0bb; box-shadow:0 0 0 4px #8fe0bb1b; }
+.frame { overflow:hidden; min-height:calc(100vh - 285px); border:1px solid var(--border); border-radius:0 0 24px 24px; background:var(--bg-card); box-shadow:0 18px 42px #112b3510; }
+.frameHead { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:.9rem 1.2rem; border-bottom:1px solid var(--border-light); color:var(--text-heading); font-size:.8rem; background:color-mix(in srgb, var(--bg-raised) 80%, transparent); }
+.frameHead strong { display:block; font-size:.82rem; }.frameHead small { display:block; margin-top:.15rem; color:var(--text-muted); font-size:.67rem; }.frameHead > span { padding:.28rem .55rem; border:1px solid var(--border-light); border-radius:99px; color:var(--text-muted); font-size:.62rem; }
+.frame iframe { display:block; width:100%; height:calc(100vh - 365px); min-height:650px; border:0; background:#fff; }
+@media(max-width:700px){.shell{padding:1rem 0 1.5rem}.hero{padding:1.7rem;align-items:start;flex-direction:column;border-radius:0}.heroStatus{white-space:normal}.frame{border-radius:0}.frameHead > span,.frameHead small{display:none}}

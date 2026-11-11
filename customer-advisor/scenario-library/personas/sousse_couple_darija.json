@@ -1,0 +1,22 @@
+{
+  "name": "Couple à Sousse (darija)",
+  "language": "darija",
+  "opening": "Aslema, n7eb otel fi Sousse l zouz adultes.",
+  "opening_covers": [
+    "destination",
+    "adults"
+  ],
+  "answers": {
+    "hotel_choice": "A3tini a7sen les hotels elli 3andek.",
+    "dates": "Mel 27/11/2026 l 29/11/2026.",
+    "adults": "Zouz adultes.",
+    "children": "Ma3andnech sghar.",
+    "board": "All inclusive.",
+    "budget": "Budget 9rib 900 dinar."
+  },
+  "follow_ups": [
+    "Chnowa a7sen wa7da fihom ?"
+  ],
+  "decline_contact": "Barcha mer9i, taw nkhamem w nrja3lek.",
+  "closing": "Ya3tik essa7a, bislema."
+}

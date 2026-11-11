@@ -1,0 +1,9 @@
+{
+  "name": "Mahdia all live offers",
+  "channel": "client-simulator",
+  "turns": [
+    {"message": "donner moi les trois meilleurs hotels a Mahdia avec un budget de 800 dt pour 2 adultes du 29/11/2026 au 30/11/2026"},
+    {"message": "donner moi tous les offres de premier hotel"},
+    {"message": "donner moi tous les offres disponible pour ce hotel", "expect": {"verified": true, "tools_used_contains": ["quote"], "offer_count_matches_reply": true}}
+  ]
+}

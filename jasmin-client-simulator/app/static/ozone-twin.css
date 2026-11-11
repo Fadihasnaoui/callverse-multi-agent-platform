@@ -1,0 +1,121 @@
+/* Shared Ozone Digital Twin skin for the preserved Jasmin pages.
+   This file is intentionally loaded after each legacy page's embedded CSS.
+   It changes presentation only: simulator behaviour and its API calls remain
+   exactly the same. */
+:root{
+  --bg-dark:#f6f8f8!important;
+  --bg-card:#ffffff!important;
+  --glass-bg:#ffffff!important;
+  --accent-primary:#6859de!important;
+  --accent-hover:#5749c6!important;
+  --accent-pale:#efedff!important;
+  --text-main:#162f39!important;
+  --text-secondary:#455b64!important;
+  --text-muted:#72858c!important;
+  --border-color:#dbe6e6!important;
+  --grid-color:#ebf1f1!important;
+  --track:#e6eeee!important;
+  --ozone-mint:#bfe9c1;
+}
+body{background:radial-gradient(circle at 92% 0,#e4e2ff 0,transparent 27%),var(--bg-dark)!important;color:var(--text-main)!important}
+.navbar{border-bottom:1px solid var(--border-color)!important;background:linear-gradient(90deg,#fff,#fbfbff)!important;box-shadow:0 8px 24px #152f3908!important}
+.brand-name{color:#263263!important}.brand::before{content:"O";display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,#285d61,#6859de);color:var(--ozone-mint);font-weight:800;font-family:system-ui}
+.btn,.button{border-radius:10px!important;box-shadow:none!important}.btn-primary,.btn-bleu,.btn-accent{background:linear-gradient(110deg,#285d61,#6859de)!important;border-color:transparent!important;color:#fff!important}.btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px #352e7920!important}
+.panel,.card,.arch-card,.kpi-card{border-color:var(--border-color)!important;border-radius:16px!important;box-shadow:0 12px 28px #15303b0b!important;background:var(--bg-card)!important}
+.panel:hover,.card:hover,.arch-card:hover{border-color:#afaaaee6!important}
+.kpi-value,.metric-value,.accent{color:#6859de!important}.badge,.tag,.status{border-radius:999px!important}
+input,select,textarea{border-color:#cbdada!important;border-radius:10px!important;background:#fff!important;color:var(--text-main)!important}
+input:focus,select:focus,textarea:focus{border-color:#6859de!important;box-shadow:0 0 0 3px #6859de1f!important}
+table thead th{background:#f5f7f7!important;color:#38515a!important}table tr:hover td{background:#fbfcff!important}
+/* Legacy Jasmin simulator: remap every visual token to the Ozone system. */
+:root{
+  color-scheme:light!important;
+  --sable:#f5f7f8!important;
+  --sable-fonce:#e5ecee!important;
+  --chaux:#ffffff!important;
+  --trait:#dce6e9!important;
+  --bleu:#6859de!important;
+  --bleu-fonce:#5142be!important;
+  --bleu-pale:#efedff!important;
+  --terracotta:#d85c47!important;
+  --terracotta-pale:#fff0ed!important;
+  --olivier:#238765!important;
+  --olivier-pale:#e8f7ef!important;
+  --encre:#172d38!important;
+  --gris:#617681!important;
+  --font-titre:'Figtree',system-ui,sans-serif!important;
+  --font-texte:'Figtree',system-ui,sans-serif!important;
+  --rayon:16px!important;
+}
+body{
+  background:radial-gradient(circle at 92% -6%,#dcd9ff 0,transparent 30%),#f5f7f8!important;
+  color:var(--encre)!important;
+}
+h1,h2,h3,.marque{font-family:var(--font-titre)!important;font-weight:750!important;letter-spacing:-.025em}
+:focus-visible{outline-color:#6859de!important}
+
+/* Login becomes an Ozone portal rather than a separate Mediterranean app. */
+.auth-screen{background:linear-gradient(135deg,#153c42 0%,#204f58 47%,#6658d9 100%)!important}
+.auth-screen::after{height:32vh!important;background:linear-gradient(180deg,transparent,#111f26)!important;clip-path:none!important;opacity:.18}
+.arche{
+  border:1px solid rgba(255,255,255,.46)!important;border-radius:22px!important;
+  padding:2.35rem!important;background:rgba(255,255,255,.97)!important;
+  box-shadow:0 26px 80px rgba(7,20,29,.36)!important;text-align:left!important;
+}
+.arche .marque{font-size:2rem!important;color:#1c4048!important}
+.arche .sous-titre{color:#617681!important}.compte-demo{background:#f1f6f6!important;border:1px solid #dce6e9!important}
+
+/* Header and hero align to the platform's navy/teal/lilac rhythm. */
+.entete{
+  min-height:74px!important;background:rgba(255,255,255,.96)!important;
+  border-bottom:1px solid #dce6e9!important;box-shadow:0 8px 25px rgba(20,48,57,.07)!important;
+}
+.logo svg{filter:hue-rotate(28deg) saturate(.75)}
+.logo .marque{color:#203c47!important;font-size:1.35rem!important}.logo small,.conseiller{color:#71838b!important}
+.bandeau{
+  margin:22px max(1rem,3vw) 0!important;border-radius:22px!important;
+  padding:2rem max(1.4rem,3vw)!important;
+  background:linear-gradient(112deg,#153f46 0%,#265863 56%,#6859d5 100%)!important;
+  box-shadow:0 20px 42px rgba(26,55,67,.14)!important;
+}
+.bandeau h1{color:#fbfff9!important;font-size:clamp(1.75rem,3vw,2.5rem)!important}
+.bandeau p{color:#e1efed!important;font-size:1rem!important}.bandeau-arche{opacity:.18!important}.bandeau-vague{display:none!important}
+
+/* Same spacious card system as the Digital Twin, without changing the grid. */
+.grille{max-width:1600px!important;gap:1.35rem!important;padding-top:1.35rem!important}
+.carte{
+  border:1px solid #dce6e9!important;border-radius:18px!important;background:#fff!important;
+  box-shadow:0 13px 32px rgba(20,48,57,.075)!important;padding:1.2rem!important;
+}
+.carte-titre{padding-bottom:.85rem!important;border-bottom:1px solid #e7eeee!important}
+.carte-titre h2{color:#203c47!important;font-size:1.13rem!important}.sous-section{border-color:#e7eeee!important}
+.sous-section h3{color:#38545d!important;font-weight:750!important}
+
+/* Profiles, chat and decision panels. */
+.archetype-card{border-color:#dce6e9!important;border-radius:12px!important;background:#fff!important}
+.archetype-card:hover{border-color:#9e95ee!important;background:#fafaff!important}
+.archetype-card.active{border-color:#8579e8!important;background:#f0efff!important;box-shadow:inset 4px 0 0 #6859de!important}
+.archetype-tag{background:#edf4f3!important;color:#57707a!important}.badge-jumeau{background:#efedff!important;color:#5142be!important}
+.messages-container{background:#f3f7f7!important;border:1px solid #e1e9ea!important;border-radius:15px!important}
+.msg-customer .message-bubble{background:#fff!important;border-color:#dce6e9!important;box-shadow:0 4px 12px rgba(20,48,57,.04)!important}
+.msg-rep .message-bubble{background:linear-gradient(120deg,#245b61,#6859de)!important}
+.avatar{background:#edf5f4!important;color:#28636b!important}.avatar-conseiller{background:linear-gradient(135deg,#285c63,#6859de)!important}
+.jauge-fond{background:#e3ecec!important}.jauge-barre{background:linear-gradient(90deg,#2b8b77,#6859de)!important}
+.hotel-vise,.bilan{border-color:#dce6e9!important;background:#f8fbfb!important}.hotel-vise.change{border-color:#9e95ee!important;background:#f0efff!important}
+.hotel-vise-prix,.hotel-vise-note,.fin-simulation{color:#5142be!important}.fin-simulation{background:#efedff!important}
+
+/* Controls and feedback are deliberately consistent with the common hub. */
+.btn{border-radius:10px!important;transition:transform .16s ease,box-shadow .16s ease,background .16s ease!important}
+.btn-bleu{background:linear-gradient(110deg,#285b62,#6859de)!important;color:#fff!important}
+.btn-bleu:hover{background:linear-gradient(110deg,#214f56,#5749c6)!important;box-shadow:0 9px 18px rgba(84,70,190,.22)!important}
+.btn-contour{border-color:#ccd9dc!important;color:#294752!important;background:#fff!important}.btn-contour:hover{border-color:#8d83e7!important;background:#f6f5ff!important}
+.btn-discret{color:#5c50ce!important}.btn-discret:hover{background:#efedff!important}
+.champ,.langue select{border-color:#ccd9dc!important;background:#fff!important}.champ:focus{border-color:#6859de!important;box-shadow:0 0 0 3px rgba(104,89,222,.13)!important}
+.btn-mic{background:#fff0ed!important;color:#d85c47!important;border-color:#f1c9bf!important}.btn-mic.recording{background:#d85c47!important;border-color:#d85c47!important}
+.point-info,.q-good{background:#efedff!important;color:#5142be!important}.point-regle,.q-excellent{background:#e8f7ef!important;color:#237552!important}.point-ouvert,.q-poor{background:#fff0ed!important;color:#a94231!important}
+.etapes li.faite::before{background:#6859de!important;border-color:#6859de!important}.etapes li.actuelle::before{border-color:#6859de!important;box-shadow:0 0 0 3px #efedff!important}
+
+/* The preserved admin, client-profile and questionnaire pages use these. */
+table thead th,.table thead th{background:#eff5f5!important;color:#38545d!important}table tbody tr:hover td{background:#fafaff!important}
+.modal-overlay{background:rgba(16,37,45,.5)!important}.modal-content{border:1px solid #dce6e9!important;border-radius:18px!important;box-shadow:0 22px 55px rgba(10,32,40,.22)!important}
+@media(max-width:760px){.bandeau{margin:12px 1rem 0!important;border-radius:16px!important}.arche{padding:1.5rem!important}.entete-actions{width:100%;justify-content:flex-start}.comptoir-actions{margin-top:.35rem}}

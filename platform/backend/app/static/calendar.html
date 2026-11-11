@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week Calendar</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1a1d21; --muted:#6b7280; --line:#e2e5ea; --accent:#2563eb; --ok:#15803d; --warn:#b45309; --bad:#b91c1c; --hover:#e8f0ff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111317; --card:#1a1d23; --text:#e8eaed; --muted:#9aa0a9; --line:#2b2f37; --accent:#6ea0ff; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --hover:#1f2a44; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, sans-serif; }
+  main { max-width:1180px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:20px; margin:0 0 4px; } h2 { font-size:16px; margin:24px 0 8px; }
+  a { color:var(--accent); }
+  input, textarea, button, select { font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:6px 10px; }
+  button { cursor:pointer; } button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:12px 0; }
+  .muted { color:var(--muted); font-size:13px; }
+  .err { color:var(--bad); font-size:13px; min-height:18px; }
+  #library { display:flex; gap:12px; overflow-x:auto; padding:10px; min-height:96px; border:2px dashed var(--line); border-radius:10px; }
+  #library.over, .cell.over { background:var(--hover); border-color:var(--accent); }
+  .vid { flex:0 0 150px; background:var(--card); border:1px solid var(--line); border-radius:8px; padding:6px; cursor:grab; }
+  .vid video { width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:6px; background:#000; display:block; }
+  .vid .t { font-size:12px; margin-top:4px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .grid { display:grid; grid-template-columns:56px repeat(7, minmax(110px, 1fr)); gap:4px; overflow-x:auto; }
+  .head { text-align:center; font-size:13px; font-weight:600; padding:4px 0; }
+  .head.today { color:var(--accent); }
+  .hour { font-size:12px; color:var(--muted); text-align:right; padding:6px 4px 0 0; }
+  .cell { min-height:78px; border:1px dashed var(--line); border-radius:6px; padding:3px; display:flex; flex-direction:column; gap:3px; background:var(--card); }
+  .cell.past { opacity:.45; }
+  .chip { font-size:12px; border-radius:6px; padding:3px 5px; background:var(--accent); color:#fff; cursor:grab; }
+  .chip.pending { background:var(--warn); } .chip.published { background:var(--ok); cursor:default; } .chip.novideo { outline:2px dashed #fff8; }
+  dialog { background:var(--card); color:var(--text); border:1px solid var(--line); border-radius:10px; }
+  .mem { display:flex; gap:8px; align-items:flex-start; border-bottom:1px solid var(--line); padding:6px 0; font-size:14px; }
+  .mem span.k { flex:0 0 78px; color:var(--muted); font-size:12px; }
+  .mem button { margin-left:auto; padding:0 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Week calendar</h1>
+  <div class="muted"><a href="/dashboard">&larr; Approval dashboard</a> &middot; <a href="/leads">Leads</a> &middot; Drag a video onto a slot to approve it for that time. Drag it back to the shelf to unschedule. Times are Tunisia time.</div>
+  <div class="bar">
+    <input id="biz" placeholder="business id" size="38">
+    <button id="load" class="primary">Load</button>
+    <button id="prev">&larr;</button><strong id="weekLabel"></strong><button id="next">&rarr;</button>
+  </div>
+  <div class="err" id="err"></div>
+
+  <h2>Video shelf <span class="muted">(unscheduled videos)</span></h2>
+  <div id="library"></div>
+
+  <h2>Week</h2>
+  <div class="grid" id="grid"></div>
+
+  <h2>Style rules</h2>
+  <div class="muted">Rules the software <b>enforces</b> on every post the agent writes. A post that breaks one is rewritten automatically and never saved in violation.</div>
+  <div class="bar">
+    <input id="rBanned" placeholder="banned words, comma separated (e.g. pas cher, cheap)" size="44" dir="auto">
+    <label>max emojis <input id="rEmoji" type="number" min="0" max="20" style="width:60px"></label>
+    <label>max hashtags <input id="rTags" type="number" min="0" max="15" style="width:60px"></label>
+    <label>max characters <input id="rChars" type="number" min="40" max="2200" style="width:80px"></label>
+    <label><input id="rQuestion" type="checkbox"> end with a question</label>
+    <button id="rSave" class="primary">Save rules</button>
+  </div>
+  <div class="muted" id="rMsg"></div>
+
+  <h2>Derja glossary</h2>
+  <div class="muted">Learned from your approved transcripts. A pair is applied automatically after it has been confirmed twice (marked auto). Add or remove pairs here.</div>
+  <div class="bar"><input id="gHeard" placeholder="heard (wrong)" size="18" dir="auto"><span>&rarr;</span><input id="gMeant" placeholder="meant (right)" size="18" dir="auto"><button id="gAdd" class="primary">Add</button></div>
+  <div id="gloss"></div>
+
+  <h2>What the agent remembers</h2>
+  <div class="muted">Separate memories so tasks don't get confused: post writing, timing, avatar voice, lead scoring and the learning engine each keep their own. A task only borrows from another memory when it mentions the same topic. Rejections, caption edits, Derja fixes and schedule choices are added automatically; notes you type are always sent to the part you pick.</div>
+  <div class="bar">
+    <select id="noteScope" title="Which part of the agent should use this note">
+      <option value="global">Everything</option><option value="content">Writing posts</option>
+      <option value="scheduling">Timing</option><option value="voice">Avatar voice</option>
+      <option value="leads">Lead scoring</option><option value="learning">Learning engine</option>
+    </select>
+    <input id="note" placeholder="e.g. Never use the word 'cheap'. Our customers are families." size="52">
+    <button id="addNote" class="primary">Remember</button>
+    <select id="memFilter"><option value="">All memories</option></select>
+  </div>
+  <div id="mem"></div>
+</main>
+<dialog id="timeDlg">
+  <form method="dialog" id="timeForm">
+    <div><strong id="timeTitle">Post at</strong></div>
+    <p><input type="time" id="timeInput" step="300" required></p>
+    <p class="muted">Tunisia time. Placing it approves the post for this time.</p>
+    <div class="bar"><button value="cancel" formnovalidate>Cancel</button><button class="primary" value="ok">Schedule</button></div>
+  </form>
+</dialog>
+<script>
+const SLOTS = ["09:00", "12:00", "15:00", "18:00", "20:00", "22:00"];
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const $ = (id) => document.getElementById(id);
+let biz = ""; try { biz = localStorage.getItem("biz") || ""; } catch (e) {}
+$("biz").value = biz;
+let weekStart = null; // "YYYY-MM-DD" of the Monday shown
+let items = [];
+
+function el(tag, props = {}, ...kids) {
+  const n = Object.assign(document.createElement(tag), props);
+  kids.flat().forEach((k) => n.append(k));
+  return n;
+}
+async function call(path, method = "GET", body) {
+  const res = await fetch(`/businesses/${biz}${path}`, { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || res.statusText);
+  return data;
+}
+const guard = (fn) => async (...a) => { $("err").textContent = ""; try { await fn(...a); } catch (e) { $("err").textContent = e.message; await refresh().catch(() => {}); } };
+
+// ---- Tunisia-time date helpers (pure date strings, no browser-timezone surprises)
+const tunisParts = (d) => Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Africa/Tunis", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+}).formatToParts(d).map((p) => [p.type, p.value]));
+const addDays = (ymd, n) => { const [y, m, d] = ymd.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
+const mondayOf = (ymd) => { const [y, m, d] = ymd.split("-").map(Number); const dow = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7; return addDays(ymd, -dow); };
+function tunisNow() { const p = tunisParts(new Date()); return { ymd: `${p.year}-${p.month}-${p.day}`, hm: `${p.hour}:${p.minute}` }; }
+
+function placement(item) { // -> {ymd, hm} in Tunisia time
+  const p = tunisParts(new Date(item.scheduled_for));
+  return { ymd: `${p.year}-${p.month}-${p.day}`, hm: `${p.hour}:${p.minute}` };
+}
+function slotFor(hm) { let s = SLOTS[0]; for (const x of SLOTS) if (x <= hm) s = x; return s; }
+
+function chip(item) {
+  const draggable = item.status === "pending" || item.status === "approved";
+  const pl = item.scheduled_for ? placement(item).hm : "";
+  const label = `${pl} ${item.platform === "instagram" ? "IG" : "FB"} ${item.type.replace("_", " ")}`;
+  const c = el("div", {
+    className: `chip ${item.status} ${item.type !== "static_post" && !item.video_url ? "novideo" : ""}`,
+    textContent: label, title: item.caption || "", draggable,
+  });
+  if (draggable) c.ondragstart = (e) => e.dataTransfer.setData("text/plain", item.id);
+  return c;
+}
+
+function vidCard(item) {
+  const c = el("div", { className: "vid", draggable: true },
+    el("video", { src: item.video_url + "#t=0.1", muted: true, preload: "metadata", controls: true }),
+    el("div", { className: "t", textContent: `${item.platform} · ${item.avatar_language ? item.avatar_language.toUpperCase() + " · " : ""}${item.caption || ""}` }));
+  c.ondragstart = (e) => e.dataTransfer.setData("text/plain", item.id);
+  return c;
+}
+
+function pickTime(title, defaultHM) {
+  return new Promise((resolve) => {
+    const dlg = $("timeDlg");
+    $("timeTitle").textContent = title; $("timeInput").value = defaultHM;
+    dlg.onclose = () => resolve(dlg.returnValue === "ok" ? $("timeInput").value : null);
+    dlg.returnValue = ""; dlg.showModal(); $("timeInput").focus();
+  });
+}
+
+function drop(zone, getLocal) {
+  zone.ondragover = (e) => { e.preventDefault(); zone.classList.add("over"); };
+  zone.ondragleave = () => zone.classList.remove("over");
+  zone.ondrop = guard(async (e) => {
+    e.preventDefault(); zone.classList.remove("over");
+    const id = e.dataTransfer.getData("text/plain");
+    if (!id) return;
+    let local = getLocal();
+    if (local) { // "YYYY-MM-DDTHH:MM" slot default -> let the owner fine-tune the minute
+      const [ymd, hm] = local.split("T");
+      const picked = await pickTime(`Post on ${ymd} at`, hm);
+      if (!picked) return;
+      local = `${ymd}T${picked}`;
+    }
+    await call(`/content/${id}/schedule`, "POST", { local_datetime: local });
+    await refresh();
+  });
+}
+
+function render() {
+  $("weekLabel").textContent = `${weekStart} → ${addDays(weekStart, 6)}`;
+  const now = tunisNow();
+
+  const lib = $("library"); lib.replaceChildren();
+  const shelf = items.filter((i) => i.video_url && !i.scheduled_for && (i.status === "pending" || i.status === "approved"));
+  if (!shelf.length) lib.append(el("span", { className: "muted", textContent: "No unscheduled videos. Render a reel or generate an avatar clip and it appears here." }));
+  shelf.forEach((i) => lib.append(vidCard(i)));
+  drop(lib, () => null);
+
+  const grid = $("grid"); grid.replaceChildren(el("div"));
+  for (let d = 0; d < 7; d++) {
+    const ymd = addDays(weekStart, d);
+    grid.append(el("div", { className: "head" + (ymd === now.ymd ? " today" : ""), textContent: `${DAYS[d]} ${ymd.slice(8)}` }));
+  }
+  const inWeek = items.filter((i) => i.scheduled_for && ["pending", "approved", "published"].includes(i.status));
+  for (const slot of SLOTS) {
+    grid.append(el("div", { className: "hour", textContent: slot }));
+    for (let d = 0; d < 7; d++) {
+      const ymd = addDays(weekStart, d);
+      const past = ymd < now.ymd || (ymd === now.ymd && slot <= now.hm);
+      const cell = el("div", { className: "cell" + (past ? " past" : "") });
+      inWeek.filter((i) => { const p = placement(i); return p.ymd === ymd && slotFor(p.hm) === slot; })
+        .forEach((i) => cell.append(chip(i)));
+      if (!past) drop(cell, () => `${ymd}T${slot}`);
+      grid.append(cell);
+    }
+  }
+}
+
+async function refresh() {
+  if (!biz) return;
+  items = await call("/content");
+  render();
+}
+
+const numOrNull = (id) => ($(id).value === "" ? null : +$(id).value);
+async function loadRules() {
+  if (!biz) return;
+  const r = await call("/rules");
+  $("rBanned").value = (r.banned_words || []).join(", ");
+  $("rEmoji").value = r.max_emojis ?? ""; $("rTags").value = r.max_hashtags ?? ""; $("rChars").value = r.max_caption_chars ?? "";
+  $("rQuestion").checked = !!r.end_with_question;
+}
+
+async function loadGlossary() {
+  const box = $("gloss"); box.replaceChildren();
+  if (!biz) return;
+  const rows = await call("/glossary");
+  if (!rows.length) box.append(el("div", { className: "muted", textContent: "Empty. It fills as you approve dictated transcripts." }));
+  rows.forEach((g) => box.append(el("div", { className: "mem" },
+    el("span", { className: "k", textContent: g.automatic ? "auto" : `seen ${g.times_seen}x` }),
+    el("span", { textContent: `${g.heard}  →  ${g.meant}`, dir: "auto" }),
+    el("button", { textContent: "×", title: "Remove", onclick: guard(async () => { await call(`/glossary/${g.id}`, "DELETE"); await loadGlossary(); }) }))));
+}
+
+async function loadMemory() {
+  const box = $("mem"); box.replaceChildren();
+  if (!biz) return;
+  const rows = await call("/memory" + ($("memFilter").value ? `?scope=${$("memFilter").value}` : ""));
+  if (!rows.length) box.append(el("div", { className: "muted", textContent: "Nothing yet. It fills as you reject, edit and schedule." }));
+  rows.forEach((m) => box.append(el("div", { className: "mem" },
+    el("span", { className: "k", textContent: m.scope + (m.pinned ? " 📌" : "") }),
+    el("span", { textContent: m.content }),
+    el("button", { textContent: "×", title: "Forget this", onclick: guard(async () => { await call(`/memory/${m.id}`, "DELETE"); await loadMemory(); }) }))));
+}
+
+$("load").onclick = guard(async () => {
+  biz = $("biz").value.trim(); try { localStorage.setItem("biz", biz); } catch (e) {}
+  weekStart = weekStart || mondayOf(tunisNow().ymd);
+  await refresh(); await loadMemory(); await loadGlossary(); await loadRules();
+});
+$("prev").onclick = () => { weekStart = addDays(weekStart, -7); render(); };
+$("next").onclick = () => { weekStart = addDays(weekStart, 7); render(); };
+$("rSave").onclick = guard(async () => {
+  await call("/rules", "PUT", { banned_words: $("rBanned").value, max_emojis: numOrNull("rEmoji"), max_hashtags: numOrNull("rTags"),
+    max_caption_chars: numOrNull("rChars"), end_with_question: $("rQuestion").checked });
+  $("rMsg").textContent = "Saved. Applies to every new post."; await loadRules();
+});
+$("gAdd").onclick = guard(async () => {
+  await call("/glossary", "POST", { heard: $("gHeard").value, meant: $("gMeant").value });
+  $("gHeard").value = ""; $("gMeant").value = ""; await loadGlossary();
+});
+$("addNote").onclick = guard(async () => {
+  const v = $("note").value.trim(); if (!v) return;
+  await call("/memory", "POST", { content: v, scope: $("noteScope").value }); $("note").value = ""; await loadMemory();
+});
+
+["global", "content", "scheduling", "voice", "leads", "learning"].forEach((sc) => $("memFilter").append(el("option", { value: sc, textContent: sc })));
+$("memFilter").onchange = guard(loadMemory);
+weekStart = mondayOf(tunisNow().ymd);
+$("load").onclick();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "EN 2 - Asks for a named hotel (Le Zenith, Hammamet)",
+  "language": "en",
+  "opening": "Hi, do you have availability at Le Zenith in Hammamet from 20/11/2026 to 23/11/2026 for 2 adults?",
+  "opening_covers": ["destination", "dates", "adults"],
+  "answers": {
+    "hotel_choice": "Le Zenith please.",
+    "dates": "From 20/11/2026 to 23/11/2026.",
+    "adults": "2 adults.",
+    "children": "No children.",
+    "board": "Breakfast included.",
+    "budget": "Around 800 dinars."
+  },
+  "follow_ups": ["Is breakfast included in that price?"],
+  "decline_contact": "Thanks, I'll think about it.",
+  "closing": "Great, thank you. Bye."
+}

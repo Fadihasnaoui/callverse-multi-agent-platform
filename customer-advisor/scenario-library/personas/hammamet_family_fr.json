@@ -1,0 +1,21 @@
+{
+  "name": "Famille à Hammamet (français, l'info arrive au compte-gouttes)",
+  "language": "fr",
+  "opening": "Bonjour, je cherche un hôtel à Hammamet.",
+  "opening_covers": [
+    "destination"
+  ],
+  "answers": {
+    "hotel_choice": "Recommandez-moi les meilleurs hôtels s'il vous plaît.",
+    "dates": "Du 20/11/2026 au 23/11/2026.",
+    "adults": "Nous sommes 2 adultes.",
+    "children": "Un enfant de 6 ans.",
+    "board": "En demi-pension si possible.",
+    "budget": "Notre budget est d'environ 1200 dinars."
+  },
+  "follow_ups": [
+    "Quelle est la moins chère parmi ces offres ?"
+  ],
+  "decline_contact": "Merci, je vais en parler avec ma femme et je vous recontacte.",
+  "closing": "Merci beaucoup pour votre aide, au revoir."
+}

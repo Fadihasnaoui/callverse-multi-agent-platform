@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jasmin | Comptoir du conseiller</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Marcellus&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+
+  <style>
+    :root {
+      color-scheme: light;
+      /* Méditerranée : sable, chaux, bleu Sidi Bou Saïd, terracotta */
+      --sable: #f6f1e7;
+      --sable-fonce: #ece3d2;
+      --chaux: #ffffff;
+      --trait: #e6dccb;
+      --bleu: #1f5fa8;
+      --bleu-fonce: #174a85;
+      --bleu-pale: #e9f1fb;
+      --terracotta: #c2562d;
+      --terracotta-pale: #fbeee8;
+      --olivier: #2f7d4f;
+      --olivier-pale: #e8f4ec;
+      --encre: #1e2a3a;
+      --gris: #5b6878;
+      --font-titre: 'Marcellus', Georgia, serif;
+      --font-texte: 'Figtree', system-ui, sans-serif;
+      --rayon: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-texte);
+      font-size: 15px;
+      line-height: 1.5;
+      background: var(--sable);
+      color: var(--encre);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, .marque { font-family: var(--font-titre); font-weight: 400; }
+
+    button, input, select, textarea { font: inherit; color: inherit; }
+
+    :focus-visible { outline: 3px solid var(--bleu); outline-offset: 2px; }
+
+    /* ---------- Boutons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      border: 1px solid transparent; border-radius: 10px;
+      padding: 0.6rem 1.1rem; font-weight: 600; font-size: 0.92rem;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+    .btn-bleu { background: var(--bleu); color: #fff; }
+    .btn-bleu:hover { background: var(--bleu-fonce); }
+    .btn-contour { background: var(--chaux); color: var(--encre); border-color: var(--trait); }
+    .btn-contour:hover { border-color: var(--gris); }
+    .btn-discret { background: transparent; color: var(--bleu); padding: 0.35rem 0.6rem; font-size: 0.85rem; }
+    .btn-discret:hover { background: var(--bleu-pale); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
+
+    .champ {
+      width: 100%;
+      background: var(--chaux);
+      border: 1px solid var(--trait);
+      border-radius: 10px;
+      padding: 0.7rem 0.9rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .champ:focus { border-color: var(--bleu); box-shadow: 0 0 0 3px var(--bleu-pale); }
+    label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.35rem; }
+
+    /* ---------- Connexion : la carte en forme d'arche ---------- */
+    .auth-screen {
+      position: fixed; inset: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem 1rem;
+      background: linear-gradient(180deg, #d7e8f7 0%, #a9cbeb 55%, #4f8fcf 100%);
+      overflow-y: auto;
+    }
+    .auth-screen::after {
+      /* dune de sable en bas de l'écran */
+      content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18vh;
+      background: var(--sable);
+      clip-path: ellipse(75% 100% at 50% 100%);
+    }
+    .arche {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 420px;
+      background: var(--chaux);
+      border: 6px solid var(--bleu);
+      border-radius: 210px 210px 18px 18px;
+      padding: 4.5rem 2rem 2rem;
+      box-shadow: 0 30px 60px -25px rgba(23, 74, 133, 0.55);
+      text-align: center;
+    }
+    .arche .marque { font-size: 2rem; color: var(--bleu); line-height: 1.1; }
+    .arche .sous-titre { color: var(--gris); margin-top: 0.35rem; }
+    .arche form { text-align: left; margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .compte-demo {
+      margin-top: 1.25rem; text-align: left;
+      background: var(--sable); border-radius: 10px; padding: 0.8rem 0.9rem;
+      font-size: 0.85rem; color: var(--gris);
+    }
+    .compte-demo-head { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; color: var(--encre); font-weight: 600; }
+    .compte-demo code { color: var(--encre); font-weight: 600; font-family: inherit; }
+    .erreur {
+      background: var(--terracotta-pale); color: #8f3a1b;
+      border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.88rem;
+    }
+
+    /* ---------- En-tête ---------- */
+    #app-view { min-height: 100vh; flex-direction: column; }
+
+    .entete {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem 1.5rem;
+      padding: 0.85rem max(1rem, 3vw);
+      padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
+      background: var(--chaux);
+      border-bottom: 3px solid var(--bleu);
+    }
+    .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit; }
+    .logo svg { flex: none; }
+    .logo .marque { font-size: 1.45rem; color: var(--bleu); line-height: 1.1; }
+    .logo small { display: block; color: var(--gris); font-size: 0.8rem; font-family: var(--font-texte); }
+    .entete-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem; }
+    .conseiller { display: flex; align-items: center; gap: 0.45rem; color: var(--gris); font-size: 0.9rem; margin-right: 0.25rem; }
+
+    /* ---------- Bandeau ciel et mer ---------- */
+    .bandeau {
+      position: relative; overflow: hidden;
+      background: linear-gradient(180deg, #d7e8f7 0%, #a9cbeb 60%, #6aa3d8 100%);
+      padding: 1.6rem max(1rem, 3vw) 2.6rem;
+    }
+    .bandeau-texte { position: relative; z-index: 1; max-width: 640px; }
+    .bandeau h1 { font-size: clamp(1.5rem, 3vw, 2.1rem); color: var(--bleu-fonce); line-height: 1.15; }
+    .bandeau p { color: #24456b; margin-top: 0.35rem; max-width: 60ch; }
+    .bandeau-vague { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 34px; display: block; }
+    .bandeau-arche { position: absolute; right: max(1rem, 4vw); bottom: 0; height: calc(100% - 10px); }
+    @media (max-width: 760px) { .bandeau-arche { display: none; } }
+
+    /* ---------- Grille principale ---------- */
+    .grille {
+      display: grid;
+      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(260px, 320px);
+      gap: 1.25rem;
+      width: 100%; max-width: 1500px; margin: 0 auto;
+      padding: 1.25rem max(1rem, 3vw) 2rem;
+      flex: 1;
+      align-items: start;  /* columns keep their own height; the chat does not stretch */
+    }
+    .grille > * { min-width: 0; }
+    @media (max-width: 1100px) { .grille { grid-template-columns: 1fr; } }
+
+    .carte {
+      background: var(--chaux);
+      border: 1px solid var(--trait);
+      border-radius: var(--rayon);
+      padding: 1.1rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .carte-titre { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .carte-titre h2 { font-size: 1.2rem; color: var(--encre); }
+    .sous-section { padding-top: 1rem; border-top: 1px solid var(--trait); display: flex; flex-direction: column; gap: 0.6rem; }
+    .sous-section h3 { font-size: 1.02rem; }
+
+    /* Dossiers clients */
+    #archetypes-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 520px; overflow-y: auto; padding-right: 0.2rem; }
+    .archetype-card {
+      text-align: left; width: 100%;
+      background: var(--chaux);
+      border: 1px solid var(--trait);
+      border-radius: 12px;
+      padding: 0.8rem 0.9rem;
+      cursor: pointer;
+      display: flex; flex-direction: column; gap: 0.35rem;
+      transition: border-color 0.15s, background-color 0.15s;
+    }
+    .archetype-card:hover { border-color: var(--bleu); }
+    .archetype-card.active { border-color: var(--bleu); background: var(--bleu-pale); box-shadow: inset 4px 0 0 var(--bleu); }
+    .archetype-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+    .archetype-name { font-weight: 700; }
+    .archetype-tag {
+      display: inline-flex; align-items: center; gap: 0.35rem; flex: none;
+      font-size: 0.76rem; font-weight: 600; color: var(--gris);
+      background: var(--sable); border-radius: 999px; padding: 0.15rem 0.55rem;
+    }
+    .archetype-tag::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--arch-color, var(--gris)); }
+    .badge-jumeau { font-size: 0.72rem; font-weight: 700; color: var(--bleu-fonce); background: var(--bleu-pale); border-radius: 999px; padding: 0.1rem 0.5rem; margin-left: 0.35rem; vertical-align: middle; }
+    .lien-client { display: block; margin-top: 1.25rem; color: var(--bleu); font-weight: 600; text-decoration: none; font-size: 0.92rem; }
+    .lien-client:hover { text-decoration: underline; }
+    .archetype-desc {
+      font-size: 0.84rem; color: var(--gris); line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .fiche { font-size: 0.88rem; display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.75rem; }
+    .fiche dt { color: var(--gris); }
+    .fiche dd { font-weight: 600; }
+
+    /* Comptoir (chat) */
+
+    .client-actif { display: flex; align-items: center; gap: 0.6rem; }
+    .avatar {
+      width: 36px; height: 36px; flex: none; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--bleu-pale); color: var(--bleu); font-weight: 700; font-size: 0.85rem;
+    }
+    .avatar-conseiller { background: var(--bleu); color: #fff; }
+    .client-actif-nom { font-weight: 700; line-height: 1.2; }
+    .client-actif small { display: block; color: var(--gris); font-size: 0.8rem; }
+
+    .messages-container {
+      flex: 1;
+      background: var(--sable);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex; flex-direction: column; gap: 0.9rem;
+      overflow-y: auto;
+      height: clamp(380px, 58vh, 620px);
+    }
+    .message { display: flex; gap: 0.6rem; align-items: flex-end; max-width: 85%; }
+    .message.msg-rep { align-self: flex-end; flex-direction: row-reverse; }
+    .message-bubble {
+      padding: 0.75rem 1rem; border-radius: 16px;
+      display: flex; flex-direction: column; gap: 0.25rem;
+      font-size: 0.94rem; line-height: 1.5;
+    }
+    .msg-customer .message-bubble { background: var(--chaux); border: 1px solid var(--trait); border-bottom-left-radius: 4px; }
+    .msg-rep .message-bubble { background: var(--bleu); color: #fff; border-bottom-right-radius: 4px; }
+    .msg-sender { font-size: 0.78rem; font-weight: 700; opacity: 0.75; }
+    .msg-transcript-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 600;
+      background: rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 0.05rem 0.4rem; margin-right: 0.3rem;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .message { animation: arrivee 0.2s ease-out; }
+      @keyframes arrivee { from { opacity: 0; transform: translateY(4px); } }
+    }
+
+    .saisie { display: flex; align-items: center; gap: 0.6rem; }
+    .btn-mic {
+      width: 46px; height: 46px; flex: none; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--terracotta-pale); color: var(--terracotta);
+      border: 1px solid #efc9b8; cursor: pointer; font-size: 1.05rem;
+    }
+    .btn-mic:hover { border-color: var(--terracotta); }
+    .btn-mic.recording { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
+    @media (prefers-reduced-motion: no-preference) {
+      .btn-mic.recording { animation: enregistre 1s ease-in-out infinite alternate; }
+      @keyframes enregistre { to { box-shadow: 0 0 0 8px rgba(194, 86, 45, 0.18); } }
+    }
+    .btn-envoyer { width: 46px; height: 46px; padding: 0; flex: none; }
+
+    /* Humeur du client */
+    .jauge { display: flex; flex-direction: column; gap: 0.3rem; }
+    .jauge-label { display: flex; justify-content: space-between; font-size: 0.9rem; }
+    .jauge-label b { font-variant-numeric: tabular-nums; }
+    .jauge-fond { height: 8px; background: var(--sable-fonce); border-radius: 999px; overflow: hidden; }
+    .jauge-barre { height: 100%; width: 50%; background: var(--bleu); border-radius: 999px; transition: width 0.5s ease-out; }
+
+    .etapes { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.88rem; }
+    .etapes li { display: flex; align-items: center; gap: 0.55rem; color: var(--gris); }
+    .etapes li::before {
+      content: ""; width: 10px; height: 10px; flex: none; border-radius: 50%;
+      border: 2px solid var(--trait); background: var(--chaux);
+    }
+    .etapes li.faite::before { background: var(--bleu); border-color: var(--bleu); }
+    .etapes li.actuelle { color: var(--encre); font-weight: 700; }
+    .etapes li.actuelle::before { background: var(--chaux); border-color: var(--bleu); box-shadow: 0 0 0 3px var(--bleu-pale); }
+
+    .point {
+      display: flex; gap: 0.5rem; align-items: flex-start;
+      border-radius: 10px; padding: 0.55rem 0.7rem; font-size: 0.86rem; line-height: 1.4;
+    }
+    .point i { margin-top: 0.2rem; }
+    .point-ouvert { background: var(--terracotta-pale); color: #8f3a1b; }
+    .point-regle { background: var(--olivier-pale); color: #22603c; }
+    .point-info { background: var(--bleu-pale); color: var(--bleu-fonce); }
+
+    .hotel-vise { border: 1px solid var(--trait); border-radius: 12px; padding: 0.8rem 0.9rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .hotel-vise.change { border-color: var(--bleu); background: var(--bleu-pale); }
+    .hotel-vise-nom { font-weight: 700; line-height: 1.3; }
+    .hotel-vise-infos { font-size: 0.86rem; color: var(--gris); }
+    .hotel-vise-prix { font-weight: 700; color: var(--bleu-fonce); font-size: 0.92rem; }
+    .hotel-vise a { color: var(--bleu); font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+    .hotel-vise a:hover { text-decoration: underline; }
+    .hotel-vise-note { font-size: 0.8rem; color: var(--bleu-fonce); font-weight: 600; }
+    .comptoir-actions { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+    .langue { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0; font-weight: 600; color: var(--bleu); font-size: 0.85rem; }
+    .langue select { border: 1px solid var(--trait); border-radius: 8px; padding: 0.3rem 0.5rem; background: var(--chaux); cursor: pointer; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .badge-qualite { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; border-radius: 999px; padding: 0.15rem 0.65rem; font-size: 0.85rem; }
+    .q-poor { background: var(--terracotta-pale); color: #8f3a1b; }
+    .q-neutral { background: var(--sable); color: var(--gris); }
+    .q-good { background: var(--bleu-pale); color: var(--bleu-fonce); }
+    .q-excellent { background: var(--olivier-pale); color: #22603c; }
+    #val-reasoning { color: var(--gris); font-size: 0.88rem; font-style: italic; }
+    .fin-simulation { align-self: center; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--bleu-fonce);
+                      background: var(--bleu-pale); border-radius: 9999px; padding: 0.45rem 1rem; margin: 0.5rem 0; }
+    .raison-intention { font-size: 0.8rem; color: var(--gris); margin-top: -0.2rem; }
+    .patience { font-size: 0.8rem; color: var(--gris); }
+    .bilan { border: 1px solid var(--trait); border-radius: var(--rayon); padding: 0.9rem 1rem; background: var(--sable); display: flex; flex-direction: column; gap: 0.5rem; }
+    .bilan-tete { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .bilan-issue { font-weight: 800; font-size: 1.05rem; }
+    .bilan-issue.gagne { color: var(--olivier); }
+    .bilan-issue.perdu { color: var(--terracotta); }
+    .bilan-note { font-weight: 800; color: var(--bleu); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+    .bilan h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--gris); margin-top: 0.3rem; }
+    .bilan ul { margin: 0; padding-left: 1.1rem; font-size: 0.86rem; display: flex; flex-direction: column; gap: 0.2rem; }
+    .bilan p { font-size: 0.88rem; margin: 0; }
+
+    /* Fenêtre "Nouveau dossier client" */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(30, 42, 58, 0.45);
+      display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--chaux); border-radius: 18px; width: 100%; max-width: 520px;
+      padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+      max-height: calc(100vh - 2rem); overflow-y: auto;
+    }
+    .modal-content h2 { font-size: 1.4rem; color: var(--bleu); }
+    .deux-colonnes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; }
+    .aide { font-size: 0.84rem; color: var(--gris); margin-top: 0.35rem; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.6rem; flex-wrap: wrap; }
+  </style>
+  <!-- Kept last so the shared Ozone Digital Twin design intentionally wins over
+       this preserved simulator's original demo styling. -->
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+</head>
+<body>
+
+  <!-- Arch-shaped logo, reused in the header -->
+  <svg width="0" height="0" style="position: absolute;" aria-hidden="true">
+    <symbol id="logo-arche" viewBox="0 0 40 48">
+      <path d="M4 46V20a16 16 0 0 1 32 0v26z" fill="#1f5fa8"/>
+      <path d="M11 46V22a9 9 0 0 1 18 0v24z" fill="#ffffff"/>
+      <path d="M14 46V24a6 6 0 0 1 12 0v22z" fill="#1f5fa8" opacity="0.85"/>
+      <circle cx="23" cy="34" r="1.2" fill="#ffffff"/>
+    </symbol>
+  </svg>
+
+  <!-- 1. Connexion -->
+  <div id="auth-view" class="auth-screen">
+    <div class="arche">
+      <h1 class="marque">Jasmin</h1>
+      <p class="sous-titre">Espace conseiller, séjours en Tunisie</p>
+
+      <div class="compte-demo">
+        <div class="compte-demo-head">
+          <span><i class="fa-solid fa-key" style="color: var(--bleu);"></i> Compte de démonstration</span>
+          <button type="button" class="btn btn-discret" onclick="fillDefaultCredentials()">Remplir</button>
+        </div>
+        <div>Email : <code>admin@simulator.com</code></div>
+        <div>Mot de passe : <code>Password123!</code></div>
+      </div>
+
+      <form onsubmit="handleLoginFormSubmit(event)">
+        <div>
+          <label for="login-email">Email professionnel</label>
+          <input type="email" id="login-email" class="champ" placeholder="prenom.nom@agence.tn" autocomplete="username" required />
+        </div>
+        <div>
+          <label for="login-password">Mot de passe</label>
+          <input type="password" id="login-password" class="champ" autocomplete="current-password" required />
+        </div>
+        <div id="login-error-msg" class="erreur" role="alert" style="display: none;"></div>
+        <button type="submit" id="btn-login-submit" class="btn btn-bleu" style="padding: 0.8rem;">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> <span>Se connecter</span>
+        </button>
+      </form>
+
+      <a class="lien-client" href="/questionnaire"><i class="fa-solid fa-suitcase-rolling"></i> Vous êtes client ? Créez votre profil voyageur</a>
+      <a class="lien-client" href="/espace"><i class="fa-solid fa-user"></i> Déjà un profil ? Accédez à votre espace client</a>
+    </div>
+  </div>
+
+  <!-- 2. Application -->
+  <div id="app-view" style="display: none;">
+
+    <header class="entete">
+      <a class="logo" href="/" aria-label="Jasmin, accueil">
+        <svg width="34" height="40" aria-hidden="true"><use href="#logo-arche"/></svg>
+        <div>
+          <span class="marque">Jasmin</span>
+          <small>Espace conseiller, séjours en Tunisie</small>
+        </div>
+      </a>
+      <div class="entete-actions">
+        <span class="conseiller"><i class="fa-solid fa-circle-user"></i> <span id="nav-user-name">Conseiller</span></span>
+        <a id="btn-admin-dashboard" href="/admin" class="btn btn-bleu" style="display: none;">
+          <i class="fa-solid fa-chart-pie"></i> <span>Dashboard Admin</span>
+        </a>
+        <button id="btn-auth-action" onclick="logoutUser()" class="btn btn-contour">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Déconnexion</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="bandeau">
+      <div class="bandeau-texte">
+        <h1>Le comptoir de l'agence</h1>
+        <p>Choisissez un dossier client, puis répondez-lui par écrit ou à la voix, comme s'il était assis en face de vous.</p>
+      </div>
+      <!-- Sidi Bou Saïd door, decorative -->
+      <svg class="bandeau-arche" viewBox="0 0 120 140" aria-hidden="true">
+        <path d="M6 140V58a54 54 0 0 1 108 0v82z" fill="#ffffff" opacity="0.92"/>
+        <path d="M24 140V62a36 36 0 0 1 72 0v78z" fill="#1f5fa8"/>
+        <path d="M60 30v110M24 92h72" stroke="#174a85" stroke-width="2"/>
+        <g fill="#ffffff" opacity="0.9">
+          <circle cx="42" cy="106" r="1.8"/><circle cx="42" cy="118" r="1.8"/><circle cx="78" cy="106" r="1.8"/><circle cx="78" cy="118" r="1.8"/>
+          <circle cx="42" cy="74" r="1.8"/><circle cx="78" cy="74" r="1.8"/>
+        </g>
+        <circle cx="66" cy="100" r="2.6" fill="#f0c36b"/>
+      </svg>
+      <svg class="bandeau-vague" viewBox="0 0 1440 34" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 18c120-14 240-14 360 0s240 14 360 0 240-14 360 0 240 14 360 0v16H0z" fill="#f6f1e7"/>
+      </svg>
+    </section>
+
+    <main class="grille">
+
+      <!-- Dossiers clients -->
+      <section class="carte" aria-labelledby="titre-dossiers">
+        <div class="carte-titre">
+          <h2 id="titre-dossiers">Dossiers clients</h2>
+          <button class="btn btn-discret" onclick="resetDefaultProfiles()" title="Remettre les dossiers par défaut">
+            <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+          </button>
+        </div>
+
+        <div id="archetypes-list">
+          <p class="archetype-desc">Chargement des dossiers...</p>
+        </div>
+
+        <button class="btn btn-contour" onclick="openGeneratorModal()">
+          <i class="fa-solid fa-user-plus"></i> Nouveau dossier client
+        </button>
+
+        <div class="sous-section">
+          <h3>Fiche du client</h3>
+          <dl id="active-profile-info" class="fiche"></dl>
+        </div>
+      </section>
+
+      <!-- Comptoir -->
+      <section class="carte comptoir" aria-labelledby="cust-name-title">
+        <div class="carte-titre">
+          <div class="client-actif">
+            <span class="avatar" id="cust-avatar" aria-hidden="true">?</span>
+            <div>
+              <div class="client-actif-nom" id="cust-name-title">Client</div>
+              <small id="cust-type">En attente du dossier</small>
+            </div>
+          </div>
+          <div class="comptoir-actions">
+            <label class="langue" title="Langue dans laquelle le client écrit et parle">
+              <i class="fa-solid fa-language" aria-hidden="true"></i>
+              <span class="sr-only">Langue du client</span>
+              <select id="sim-language" onchange="changeLanguage()">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+            <button class="btn btn-discret" onclick="restartSimulation()" title="Recommencer la conversation avec ce client">
+              <i class="fa-solid fa-rotate-right"></i> Recommencer
+            </button>
+            <button class="btn btn-discret" onclick="endSimulation()" title="Terminer et voir le bilan">
+              <i class="fa-solid fa-flag-checkered"></i> Terminer
+            </button>
+          </div>
+        </div>
+
+        <div class="messages-container" id="messages-box" aria-live="polite"></div>
+
+        <!-- Customer voice plays here, never shown -->
+        <audio id="customer-audio-player" hidden></audio>
+
+        <div class="saisie">
+          <button class="btn-mic" id="btn-mic" onclick="toggleMicrophone()" title="Répondre à la voix" aria-label="Répondre à la voix">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <input type="text" id="rep-input" class="champ" placeholder="Votre réponse au client : hôtel, chambre, vol, formule..." onkeypress="handleKeyPress(event)" aria-label="Votre réponse au client" />
+          <button class="btn btn-bleu btn-envoyer" onclick="sendTextMessage()" aria-label="Envoyer">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- Humeur du client -->
+      <section class="carte" aria-labelledby="titre-humeur">
+        <div class="carte-titre"><h2 id="titre-humeur">Humeur du client</h2></div>
+
+        <div class="jauge">
+          <div class="jauge-label"><span>Confiance</span><b id="val-trust">– / 10</b></div>
+          <div class="jauge-fond"><div class="jauge-barre" id="bar-trust"></div></div>
+        </div>
+        <div class="jauge">
+          <div class="jauge-label"><span>Intérêt</span><b id="val-interest">– / 10</b></div>
+          <div class="jauge-fond"><div class="jauge-barre" id="bar-interest"></div></div>
+        </div>
+        <div class="jauge">
+          <div class="jauge-label"><span>Envie de réserver</span><b id="val-intent">– / 10</b></div>
+          <div class="jauge-fond"><div class="jauge-barre" id="bar-intent"></div></div>
+        </div>
+        <p class="raison-intention" id="val-intent-reason" aria-live="polite"></p>
+        <p class="patience" id="val-patience"></p>
+
+        <div class="sous-section" id="bilan-section" hidden>
+          <h3>Bilan de la simulation</h3>
+          <div class="bilan" id="bilan"></div>
+        </div>
+
+        <div class="sous-section">
+          <h3>Hôtel qui intéresse le client</h3>
+          <div id="hotel-vise" class="hotel-vise" aria-live="polite">
+            <span class="hotel-vise-infos">Proposez des hôtels au client : celui qui l'intéresse le plus s'affichera ici.</span>
+          </div>
+        </div>
+
+        <div class="sous-section">
+          <h3>Étape de la vente</h3>
+          <ol class="etapes" id="val-stage"></ol>
+        </div>
+
+        <div class="sous-section">
+          <h3>Points à clarifier</h3>
+          <div id="objections-list-box" style="display: flex; flex-direction: column; gap: 0.45rem;">
+            <div class="point point-info"><i class="fa-solid fa-circle-info"></i><span>Le client attend des détails sur l'hôtel, la chambre et la formule.</span></div>
+          </div>
+        </div>
+
+        <div class="sous-section">
+          <h3>Votre performance de conseiller</h3>
+          <div><span id="val-quality" class="badge-qualite q-neutral">En attente</span></div>
+          <p id="val-reasoning">Envoyez votre première réponse pour recevoir une évaluation.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Nouveau dossier client -->
+    <div class="modal-overlay" id="gen-modal" role="dialog" aria-modal="true" aria-labelledby="gen-title">
+      <div class="modal-content">
+        <h2 id="gen-title">Nouveau dossier client</h2>
+
+        <div>
+          <label for="gen-archetype">Type de clientèle</label>
+          <select id="gen-archetype" class="champ"></select>
+          <p id="gen-archetype-desc" class="aide"></p>
+        </div>
+
+        <div>
+          <label for="gen-background">Situation du client</label>
+          <textarea id="gen-background" class="champ" rows="3" placeholder="Ex : famille de 4 personnes, cherche un hôtel All Inclusive 4* avec parc aquatique à Hammamet ou Sousse" style="resize: vertical;"></textarea>
+        </div>
+
+        <div class="deux-colonnes">
+          <div>
+            <label for="gen-scenario">Situation du persona</label>
+            <select id="gen-scenario" class="champ">
+              <option value="">Selon le type de clientèle</option>
+              <option value="premiere_demande">Première demande</option>
+              <option value="rappel_devis">Rappel après devis</option>
+              <option value="derniere_minute">Dernière minute</option>
+              <option value="modification">Modification de réservation</option>
+              <option value="reclamation">Réclamation</option>
+              <option value="client_fidele">Client fidèle</option>
+              <option value="groupe">Groupe d'amis</option>
+            </select>
+          </div>
+          <div>
+            <label for="gen-difficulty">Difficulté</label>
+            <select id="gen-difficulty" class="champ">
+              <option value="">Selon le type de clientèle</option>
+              <option value="facile">Facile</option>
+              <option value="normal">Normal</option>
+              <option value="difficile">Difficile</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="deux-colonnes">
+          <div>
+            <label for="gen-dest">Région</label>
+            <input type="text" id="gen-dest" class="champ" placeholder="Ex : Djerba, Hammamet, Tozeur" />
+          </div>
+          <div>
+            <label for="gen-budget">Budget maximum (TND)</label>
+            <input type="number" id="gen-budget" class="champ" placeholder="Ex : 2500" min="0" />
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-contour" onclick="closeGeneratorModal()">Annuler</button>
+          <button class="btn btn-bleu" onclick="submitGeneratePersona()"><i class="fa-solid fa-user-plus"></i> Créer le dossier</button>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- End #app-view -->
+
+  <script>
+    let currentUser = null;
+    let activeProfileId = "";
+    let currentSimulationId = "";
+    let activeCustomerName = "Client";
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let archetypesByKey = {};
+
+    // Restore the advisor's last language choice (per browser)
+    try {
+      const saved = localStorage.getItem("simulator_language");
+      if (saved === "en" || saved === "fr") document.getElementById("sim-language").value = saved;
+      if (saved === "en") document.getElementById("rep-input").placeholder = "Your reply to the client (English or French): hotel, room, flight, package...";
+    } catch (e) {}
+
+    const STAGES = [
+      ["greetings", "Accueil"],
+      ["needs_discovery", "Découverte des besoins"],
+      ["recommendation", "Proposition"],
+      ["objection_handling", "Réponse aux objections"],
+      ["negotiation", "Négociation"],
+      ["closing", "Conclusion"]
+    ];
+    const QUALITY = {
+      poor: ["Faible", "fa-arrow-trend-down"],
+      neutral: ["Neutre", "fa-minus"],
+      good: ["Bon", "fa-thumbs-up"],
+      excellent: ["Excellent", "fa-star"]
+    };
+
+    // Escape text before it goes into an HTML template (LLM output, generated names)
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const initials = name => String(name || "?").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join("");
+
+    async function loadArchetypes() {
+      if (Object.keys(archetypesByKey).length) return;
+      const res = await fetch("/api/v1/archetypes");
+      const list = await res.json();
+      archetypesByKey = Object.fromEntries(list.map(a => [a.key, a]));
+      const select = document.getElementById("gen-archetype");
+      select.replaceChildren(...list.map(a => new Option(a.label, a.key)));
+      const showDesc = () => { document.getElementById("gen-archetype-desc").textContent = archetypesByKey[select.value]?.description || ""; };
+      select.onchange = showDesc;
+      showDesc();
+    }
+
+    const archetypeOf = key => archetypesByKey[key] || { label: key || "—", color: "" };
+
+    // Load user on start - only load profiles if logged in
+    window.addEventListener("DOMContentLoaded", async () => {
+      const isAuth = checkAuthStatus();
+      if (isAuth && await verifySession()) {
+        await loadProfiles();
+      }
+    });
+
+    // Authentication functions
+    function checkAuthStatus() {
+      const stored = localStorage.getItem("simulator_user");
+      const token = localStorage.getItem("simulator_token");
+      const authView = document.getElementById("auth-view");
+      const appView = document.getElementById("app-view");
+      const navUserName = document.getElementById("nav-user-name");
+
+      if (stored && token) {
+        try {
+          currentUser = JSON.parse(stored);
+          if (currentUser.role === "client") { window.location.href = "/espace"; return false; }  // clients have their own space
+          if (authView) authView.style.display = "none";
+          if (appView) appView.style.display = "flex";
+          if (navUserName) navUserName.innerText = currentUser.full_name || currentUser.email;
+          document.getElementById("btn-admin-dashboard").style.display = currentUser.role === "admin" ? "inline-flex" : "none";
+          return true;
+        } catch (e) {
+          localStorage.removeItem("simulator_user");
+          localStorage.removeItem("simulator_token");
+        }
+      }
+
+      currentUser = null;
+      if (authView) authView.style.display = "flex";
+      if (appView) appView.style.display = "none";
+      return false;
+    }
+
+    // The stored token may be stale (e.g. revoked); ask the server before showing the app
+    async function verifySession() {
+      try {
+        const res = await fetch("/api/v1/auth/me", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("simulator_token")}` }
+        });
+        if (!res.ok) { logoutUser(); return false; }
+        const user = await res.json();
+        localStorage.setItem("simulator_user", JSON.stringify(user));
+        checkAuthStatus();
+        return true;
+      } catch (err) {
+        return true;  // server unreachable: keep the session, calls will fail visibly
+      }
+    }
+
+    function fillDefaultCredentials() {
+      document.getElementById("login-email").value = "admin@simulator.com";
+      document.getElementById("login-password").value = "Password123!";
+    }
+
+    function handleLoginFormSubmit(e) {
+      if (e) e.preventDefault();
+      submitLogin();
+    }
+
+    async function submitLogin() {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value.trim();
+      const errBox = document.getElementById("login-error-msg");
+      const btn = document.getElementById("btn-login-submit");
+
+      if (!email || !password) {
+        errBox.innerText = "Renseignez votre email et votre mot de passe.";
+        errBox.style.display = "block";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connexion...';
+
+      try {
+        const res = await fetch("/api/v1/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.detail || "Connexion impossible.");
+        }
+
+        const data = await res.json();
+        currentUser = data.user;
+        localStorage.setItem("simulator_token", data.access_token);
+        localStorage.setItem("simulator_user", JSON.stringify(data.user));
+
+        errBox.style.display = "none";
+        checkAuthStatus();
+        await loadProfiles();
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> <span>Se connecter</span>';
+      }
+    }
+
+    function logoutUser() {
+      const token = localStorage.getItem("simulator_token");
+      if (token) fetch("/api/v1/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } }).catch(() => {});
+      currentUser = null;
+      localStorage.removeItem("simulator_token");
+      localStorage.removeItem("simulator_user");
+      checkAuthStatus();
+    }
+
+    async function loadProfiles(selectId = null) {
+      try {
+        await loadArchetypes();
+        const res = await fetch("/api/v1/profiles");
+        const profiles = await res.json();
+
+        renderProfilesList(profiles);
+
+        if (profiles.length > 0) {
+          const target = selectId ? profiles.find(p => p.id === selectId) : profiles[0];
+          const selected = target || profiles[0];
+          activeProfileId = selected.id;
+          updateActiveProfileUI(selected);
+          highlightActiveCard(selected.id);
+          await startSimulation(activeProfileId);
+        }
+      } catch (err) {
+        console.error("Error loading profiles:", err);
+      }
+    }
+
+    function renderProfilesList(profiles) {
+      const container = document.getElementById("archetypes-list");
+      container.innerHTML = "";
+
+      profiles.forEach(p => {
+        const arch = archetypeOf(p.archetype);
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `archetype-card ${p.id === activeProfileId ? 'active' : ''}`;
+        card.id = `card-prof-${p.id}`;
+        card.onclick = () => selectPersonaById(p.id);
+        card.innerHTML = `
+          <span class="archetype-header">
+            <span class="archetype-name">${esc(p.name)}${(p.scenario_id || "").startsWith("twin_") ? '<span class="badge-jumeau" title="Profil créé par un vrai client via le questionnaire">Jumeau</span>' : ""}</span>
+            <span class="archetype-tag" style="--arch-color: ${esc(arch.color)};">${esc(arch.label)}</span>
+          </span>
+          <span class="archetype-desc">${esc(p.persona_description || "Aucune description.")}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function selectPersonaById(profileId) {
+      try {
+        const res = await fetch(`/api/v1/profiles/${profileId}`);
+        const p = await res.json();
+        activeProfileId = p.id;
+        updateActiveProfileUI(p);
+        highlightActiveCard(p.id);
+        await startSimulation(activeProfileId);
+      } catch (err) {
+        console.error("Error selecting persona:", err);
+      }
+    }
+
+    function highlightActiveCard(profileId) {
+      document.querySelectorAll(".archetype-card").forEach(el => el.classList.remove("active"));
+      const activeCard = document.getElementById(`card-prof-${profileId}`);
+      if (activeCard) activeCard.classList.add("active");
+    }
+
+    async function resetDefaultProfiles() {
+      try {
+        const res = await fetch("/api/v1/profiles/reset-defaults", { method: "POST" });
+        if (res.ok) {
+          await loadProfiles();
+        }
+      } catch (err) {
+        console.error("Erreur réinitialisation profils:", err);
+      }
+    }
+
+    function updateActiveProfileUI(p) {
+      activeCustomerName = p.name;
+      const arch = archetypeOf(p.archetype);
+      document.getElementById("cust-name-title").textContent = p.name;
+      document.getElementById("cust-avatar").textContent = initials(p.name);
+      document.getElementById("cust-type").textContent = `${arch.label}, ${p.number_of_travelers} voyageur(s)`;
+
+      const dest = Array.isArray(p.destination_preferences) ? p.destination_preferences.join(", ") : (p.destination_preferences || "Tunisie");
+      const dates = p.travel_dates ? `${p.travel_dates.start_date} au ${p.travel_dates.end_date}` : "—";
+      document.getElementById("active-profile-info").innerHTML = `
+        <dt>Type</dt><dd>${esc(arch.label)}</dd>
+        <dt>Budget</dt><dd>${esc(Math.round(p.budget_total).toLocaleString("fr-FR"))} TND max</dd>
+        <dt>Situation</dt><dd id="fiche-scenario">—</dd>
+        <dt>Difficulté</dt><dd id="fiche-difficulty">—</dd>
+        <dt>Dates</dt><dd id="fiche-dates">${esc(dates)}</dd>
+        <dt>Hôtels</dt><dd>${esc(dest)}</dd>
+        <dt>Attente</dt><dd style="font-weight: 400;">${esc(p.desired_outcome || "Détails du séjour")}</dd>
+      `;
+    }
+
+    const SCENARIO_LABELS = { premiere_demande: "Première demande", rappel_devis: "Rappel après devis", derniere_minute: "Dernière minute",
+      modification: "Modification de réservation", reclamation: "Réclamation", client_fidele: "Client fidèle", groupe: "Groupe d'amis" };
+    const DIFFICULTY_LABELS = { facile: "Facile", normal: "Normal", difficile: "Difficile" };
+    let startCounter = 0;
+    async function startSimulation(profileId) {
+      // The client walks in with a region (live hotel prices load in the background); a newer start
+      // (other client, scenario or language picked meanwhile) wins over a slower, older one
+      const startId = ++startCounter;
+      currentSimulationId = null;
+      setConversationOpen(false);
+      document.getElementById("bilan-section").hidden = true;
+      document.getElementById("messages-box").replaceChildren();
+      const language = document.getElementById("sim-language").value;
+      appendMessage(activeCustomerName, language === "en"
+        ? "The client is walking in…"
+        : "Le client entre dans l'agence…", false);
+      try {
+        const res = await fetch("/api/v1/simulations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profile_id: profileId, language })
+        });
+        const sim = await res.json();
+        if (startId !== startCounter) return;  // stale: the advisor already started another simulation
+        currentSimulationId = sim.id;
+
+        document.getElementById("messages-box").replaceChildren();
+        appendMessage(activeCustomerName, sim.initial_message || "Bonjour ! Je recherche un séjour en Tunisie. Que me proposez-vous ?", false);
+        updateMeters(sim.trust_level, sim.interest_level, sim.booking_intention, sim.current_stage);
+        renderHotel((sim.known_requirements || {}).hotel_vise);
+        resetFeedback();
+        setConversationOpen(true);
+        renderPatience((sim.decision_state || {}).patience_left, (sim.decision_state || {}).patience);
+        const ds = sim.decision_state || {};
+        const fr = iso => iso ? new Date(iso).toLocaleDateString("fr-FR") : "";
+        const SEASON = { hiver: "hiver", printemps: "printemps", ete: "été", automne: "automne" };
+        const datesBox = document.getElementById("fiche-dates");
+        if (datesBox && ds.check_in) datesBox.textContent = `${fr(ds.check_in)} au ${fr(ds.check_out)} (${SEASON[ds.season] || ds.season})`;
+        const scenarioBox = document.getElementById("fiche-scenario"), difficultyBox = document.getElementById("fiche-difficulty");
+        if (scenarioBox) scenarioBox.textContent = SCENARIO_LABELS[sim.scenario] || sim.scenario;
+        if (difficultyBox) difficultyBox.textContent = DIFFICULTY_LABELS[sim.difficulty] || sim.difficulty;
+
+        if (sim.initial_audio) {
+          playCustomerAudio(sim.initial_audio);
+        }
+      } catch (err) {
+        console.error("Error starting simulation:", err);
+      }
+    }
+
+    // The client's language is fixed for a conversation: switching restarts it in the new language
+    async function changeLanguage() {
+      const language = document.getElementById("sim-language").value;
+      try { localStorage.setItem("simulator_language", language); } catch (e) {}
+      document.getElementById("rep-input").placeholder = language === "en"
+        ? "Your reply to the client (English or French): hotel, room, flight, package..."
+        : "Votre réponse au client : hôtel, chambre, vol, formule...";
+      await restartSimulation();
+    }
+
+    async function restartSimulation() {
+      if (activeProfileId) {
+        await startSimulation(activeProfileId);
+      }
+    }
+
+    async function sendTextMessage() {
+      const input = document.getElementById("rep-input");
+      const text = input.value.trim();
+      if (!text || !currentSimulationId) return;
+
+      appendMessage("Vous", text, true);
+      input.value = "";
+
+      try {
+        const res = await fetch(`/api/v1/simulations/${currentSimulationId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Le client n'a pas pu répondre.");
+        handleCustomerTurnResponse(data);
+      } catch (err) {
+        renderPoints([], [], err.message);
+      }
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === "Enter") sendTextMessage();
+    }
+
+    // Microphone Recording for Voice Input (Groq Whisper)
+    async function toggleMicrophone() {
+      const micBtn = document.getElementById("btn-mic");
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.onstop = async () => {
+            stream.getTracks().forEach(t => t.stop());
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            await sendVoiceMessage(audioBlob);
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          micBtn.classList.add("recording");
+          micBtn.setAttribute("aria-label", "Arrêter l'enregistrement");
+        } catch (err) {
+          alert("Impossible d'accéder au microphone : " + err.message);
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        micBtn.classList.remove("recording");
+        micBtn.setAttribute("aria-label", "Répondre à la voix");
+      }
+    }
+
+    async function sendVoiceMessage(blob) {
+      if (!currentSimulationId) return;
+
+      const formData = new FormData();
+      formData.append("file", blob, "recording.webm");
+
+      const bubbleText = appendMessage("Vous", "Transcription de votre message vocal...", true);
+      try {
+        const res = await fetch(`/api/v1/simulations/${currentSimulationId}/voice_message`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          bubbleText.textContent = data.detail || "Message vocal non reconnu.";
+          return;
+        }
+
+        if (data.transcription) {
+          bubbleText.innerHTML = `<span class="msg-transcript-tag"><i class="fa-solid fa-microphone"></i> vocal</span>`;
+          bubbleText.append(data.transcription);
+        }
+
+        handleCustomerTurnResponse(data);
+      } catch (err) {
+        bubbleText.textContent = "Envoi du message vocal impossible. Vérifiez la connexion au serveur.";
+      }
+    }
+
+    function handleCustomerTurnResponse(data) {
+      appendMessage(activeCustomerName, data.customer_response, false);
+      updateMeters(data.trust_level, data.interest_level, data.booking_intention, data.current_stage);
+
+      const [label, icon] = QUALITY[data.detected_rep_quality] || [data.detected_rep_quality, "fa-minus"];
+      const badge = document.getElementById("val-quality");
+      badge.className = `badge-qualite q-${data.detected_rep_quality}`;
+      badge.innerHTML = `<i class="fa-solid ${icon}"></i> ${esc(label)}`;
+      document.getElementById("val-reasoning").textContent = data.reasoning;
+
+      renderPoints(data.new_unresolved_objections || [], data.addressed_objections || []);
+      renderHotel(data.hotel_vise_details);
+      document.getElementById("val-intent-reason").textContent = data.intent_reason || "";
+      renderPatience(data.patience_left, null);
+      if (data.outcome) {
+        setConversationOpen(false);
+        renderBilan(data.debrief || { resultat: data.outcome, raison: data.outcome_reason });
+        announceEnd((data.debrief || {}).resultat || data.outcome, data.outcome_reason);
+      }
+
+      if (data.audio_response) {
+        playCustomerAudio(data.audio_response);
+      }
+    }
+
+    let patienceMax = null;
+    function renderPatience(left, max) {
+      if (max) patienceMax = max;
+      const box = document.getElementById("val-patience");
+      if (left == null || !patienceMax) { box.textContent = ""; return; }
+      const ratio = left / patienceMax;
+      box.textContent = "Patience du client : " + (ratio > 0.6 ? "bonne" : ratio > 0.3 ? "s'épuise" : "presque à bout");
+    }
+
+    function setConversationOpen(open) {
+      const input = document.getElementById("rep-input");
+      input.disabled = !open;
+      input.placeholder = open ? "Votre réponse au client : hôtel, chambre, vol, formule..."
+                               : "Simulation terminée : cliquez sur « Recommencer » pour une nouvelle conversation";
+      document.getElementById("btn-mic").disabled = !open;
+      document.getElementById("bilan-section").hidden = open;
+      if (open) document.getElementById("val-intent-reason").textContent = "";
+    }
+
+    // Visible end of the conversation in the chat, with the outcome and where to find the debrief
+    function announceEnd(label, reason) {
+      const box = document.getElementById("messages-box");
+      const note = document.createElement("div");
+      note.className = "fin-simulation";
+      note.setAttribute("role", "status");
+      note.textContent = `Conversation terminée : ${label}${reason ? ` (${reason})` : ""}. Le bilan est affiché à droite.`;
+      box.append(note);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function endSimulation() {
+      if (!currentSimulationId) return;
+      const res = await fetch(`/api/v1/simulations/${currentSimulationId}/end`, { method: "POST" });
+      const sim = await res.json();
+      if (!res.ok) return;
+      setConversationOpen(false);
+      renderBilan(sim.debrief || {});
+      announceEnd((sim.debrief || {}).resultat || "terminée par le conseiller", "");
+    }
+
+    // Debrief of a finished simulation; every value goes through textContent (LLM output)
+    function renderBilan(b) {
+      const box = document.getElementById("bilan");
+      const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+      const won = ["Réservé", "Option posée"].includes(b.resultat);
+      const head = el("div", "bilan-tete");
+      head.append(el("span", "bilan-issue " + (won ? "gagne" : b.resultat === "Perdu" ? "perdu" : ""), b.resultat || "Terminé"));
+      if (b.score_sur_20 != null) head.append(el("span", "bilan-note", `${b.score_sur_20} / 20`));
+      const parts = [head];
+      if (b.raison) parts.push(el("p", null, b.raison));
+      if (b.resume) parts.push(el("p", null, b.resume));
+      const list = (title, items) => {
+        if (!items || !items.length) return;
+        parts.push(el("h4", null, title));
+        const ul = el("ul");
+        items.forEach(i => ul.append(el("li", null, i)));
+        parts.push(ul);
+      };
+      list("Points forts", b.points_forts);
+      list("Points faibles", b.points_faibles);
+      list("Infos cachées découvertes", b.infos_cachees_trouvees);
+      list("Infos cachées manquées", b.infos_cachees_ratees);
+      list("Besoins non couverts", b.besoins_non_couverts);
+      list("Moments clés", b.moments_cles);
+      list("Conseils", b.conseils);
+      box.replaceChildren(...parts);
+      document.getElementById("bilan-section").hidden = false;
+      document.getElementById("bilan-section").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function renderPoints(open, solved, errorMessage = "") {
+      const box = document.getElementById("objections-list-box");
+      const point = (cls, icon, text) => `<div class="point ${cls}"><i class="fa-solid ${icon}"></i><span>${esc(text)}</span></div>`;
+      if (errorMessage) {
+        box.innerHTML = point("point-ouvert", "fa-triangle-exclamation", errorMessage);
+      } else if (open.length || solved.length) {
+        box.innerHTML = open.map(o => point("point-ouvert", "fa-circle-question", o)).join("")
+          + solved.map(o => point("point-regle", "fa-check", `Réglé : ${o}`)).join("");
+      } else {
+        box.innerHTML = point("point-info", "fa-circle-info", "Aucun nouveau point soulevé par le client.");
+      }
+    }
+
+    // Hotel the client prefers among those the advisor proposed
+    let currentHotelName = null;
+    function renderHotel(h) {
+      const box = document.getElementById("hotel-vise");
+      if (!h) {
+        currentHotelName = null;
+        box.className = "hotel-vise";
+        box.innerHTML = `<span class="hotel-vise-infos">Proposez des hôtels au client : celui qui l'intéresse le plus s'affichera ici.</span>`;
+        return;
+      }
+      const changed = currentHotelName !== null && currentHotelName !== h.name;
+      currentHotelName = h.name;
+      box.className = `hotel-vise${changed ? " change" : ""}`;
+      box.innerHTML = `
+        ${changed ? '<span class="hotel-vise-note"><i class="fa-solid fa-arrows-rotate"></i> Le client a changé d&#39;avis</span>' : ""}
+        <span class="hotel-vise-nom">${esc(h.name)}</span>
+        ${h.city ? `<span class="hotel-vise-infos">${esc(h.city)}</span>` : ""}`;
+    }
+
+    function resetFeedback() {
+      const badge = document.getElementById("val-quality");
+      badge.className = "badge-qualite q-neutral";
+      badge.textContent = "En attente";
+      document.getElementById("val-reasoning").textContent = "Envoyez votre première réponse pour recevoir une évaluation.";
+      document.getElementById("objections-list-box").innerHTML =
+        `<div class="point point-info"><i class="fa-solid fa-circle-info"></i><span>Le client attend des détails sur l'hôtel, la chambre et la formule.</span></div>`;
+    }
+
+    // Customer voice plays in the background, no visible player
+    function playCustomerAudio(src) {
+      const player = document.getElementById("customer-audio-player");
+      player.src = src;
+      player.play().catch(e => console.log("Audio autoplay blocked by browser:", e));
+    }
+
+    // Returns the text element so callers can update it (voice transcription)
+    function appendMessage(sender, text, isRep) {
+      const msgBox = document.getElementById("messages-box");
+      const row = document.createElement("div");
+      row.className = `message ${isRep ? "msg-rep" : "msg-customer"}`;
+      row.innerHTML = `
+        <span class="avatar ${isRep ? "avatar-conseiller" : ""}" aria-hidden="true">${isRep ? '<i class="fa-solid fa-user-tie"></i>' : esc(initials(sender))}</span>
+        <div class="message-bubble">
+          <span class="msg-sender"></span>
+          <span class="msg-text"></span>
+        </div>
+      `;
+      // textContent: LLM and user text must never be parsed as HTML
+      row.querySelector(".msg-sender").textContent = sender;
+      const textEl = row.querySelector(".msg-text");
+      textEl.textContent = text;
+      msgBox.appendChild(row);
+      msgBox.scrollTop = msgBox.scrollHeight;
+      return textEl;
+    }
+
+    function updateMeters(trust, interest, intent, stage) {
+      document.getElementById("val-trust").innerText = `${trust} / 10`;
+      document.getElementById("bar-trust").style.width = `${trust * 10}%`;
+
+      document.getElementById("val-interest").innerText = `${interest} / 10`;
+      document.getElementById("bar-interest").style.width = `${interest * 10}%`;
+
+      document.getElementById("val-intent").innerText = `${intent} / 10`;
+      document.getElementById("bar-intent").style.width = `${intent * 10}%`;
+
+      const current = STAGES.findIndex(([key]) => key === stage);
+      document.getElementById("val-stage").innerHTML = STAGES.map(([, label], i) => {
+        const cls = i < current ? "faite" : i === current ? "actuelle" : "";
+        return `<li class="${cls}"${i === current ? ' aria-current="step"' : ""}>${label}</li>`;
+      }).join("");
+    }
+
+    // Modal functions
+    function openGeneratorModal() {
+      document.getElementById("gen-modal").classList.add("active");
+      document.getElementById("gen-archetype").focus();
+    }
+    function closeGeneratorModal() { document.getElementById("gen-modal").classList.remove("active"); }
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeGeneratorModal(); });
+
+    async function submitGeneratePersona() {
+      const arch = document.getElementById("gen-archetype").value;
+      const bg = document.getElementById("gen-background").value.trim();
+      const dest = document.getElementById("gen-dest").value.trim();
+      const budget = document.getElementById("gen-budget").value.trim();
+
+      let url = `/api/v1/profiles/generate?archetype=${encodeURIComponent(arch)}`;
+      if (bg) url += `&background=${encodeURIComponent(bg)}`;
+      if (dest) url += `&destination=${encodeURIComponent(dest)}`;
+      if (budget) url += `&budget=${encodeURIComponent(budget)}`;
+      const scenario = document.getElementById("gen-scenario").value, difficulty = document.getElementById("gen-difficulty").value;
+      if (scenario) url += `&scenario=${encodeURIComponent(scenario)}`;
+      if (difficulty) url += `&difficulty=${encodeURIComponent(difficulty)}`;
+
+      try {
+        const res = await fetch(url, { method: "POST" });
+        const newProf = await res.json();
+        closeGeneratorModal();
+
+        document.getElementById("gen-background").value = "";
+        document.getElementById("gen-dest").value = "";
+        document.getElementById("gen-budget").value = "";
+
+        await loadProfiles(newProf.id);
+      } catch (err) {
+        alert("Création du dossier impossible : " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

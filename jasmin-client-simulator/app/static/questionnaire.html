@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jasmin | Créer mon persona voyageur</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Marcellus&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+
+  <style>
+    :root {
+      color-scheme: light;
+      --sable: #f6f1e7;
+      --chaux: #ffffff;
+      --trait: #e6dccb;
+      --bleu: #1f5fa8;
+      --bleu-fonce: #174a85;
+      --bleu-pale: #e9f1fb;
+      --terracotta-pale: #fbeee8;
+      --encre: #1e2a3a;
+      --gris: #5b6878;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+    body { font-family: 'Figtree', system-ui, sans-serif; font-size: 16px; line-height: 1.55; background: var(--sable); color: var(--encre); min-height: 100vh; }
+    h1, h2, .marque { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    :focus-visible { outline: 3px solid var(--bleu); outline-offset: 2px; }
+
+    .ciel {
+      background: linear-gradient(180deg, #d7e8f7 0%, #a9cbeb 65%, #6aa3d8 100%);
+      padding: calc(1.25rem + env(safe-area-inset-top, 0px)) 1rem 3.5rem;
+      position: relative;
+    }
+    .ciel-inner { max-width: 720px; margin: 0 auto; }
+    .logo { display: flex; align-items: center; gap: 0.6rem; color: var(--bleu); text-decoration: none; }
+    .logo .marque { font-size: 1.35rem; }
+    .haut { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .retour { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--bleu); font-weight: 600; font-size: 0.9rem; text-decoration: none;
+              background: #fff; border: 1px solid var(--trait); border-radius: 10px; padding: 0.45rem 0.85rem; }
+    .retour:hover { border-color: var(--bleu); }
+    .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+    .btn.btn-contour { background: #fff; color: var(--bleu); border: 1px solid var(--trait); text-decoration: none; }
+    .btn.btn-contour:hover { background: var(--bleu-pale); }
+    .ciel h1 { font-size: clamp(1.7rem, 5vw, 2.4rem); color: var(--bleu-fonce); line-height: 1.15; margin-top: 1.5rem; }
+    .ciel p { color: #24456b; margin-top: 0.5rem; max-width: 58ch; }
+    .vague { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 34px; display: block; }
+
+    main { max-width: 720px; margin: -1.25rem auto 0; padding: 0 1rem 3rem; position: relative; }
+    .carte { background: var(--chaux); border: 1px solid var(--trait); border-radius: 18px; padding: clamp(1.1rem, 4vw, 2rem); }
+    form { display: flex; flex-direction: column; gap: 1.4rem; }
+
+    label, .question { display: block; font-weight: 600; margin-bottom: 0.4rem; }
+    .aide { font-weight: 400; color: var(--gris); font-size: 0.88rem; }
+    .champ { width: 100%; background: var(--chaux); border: 1px solid var(--trait); border-radius: 10px; padding: 0.7rem 0.9rem; outline: none; }
+    .champ:focus { border-color: var(--bleu); box-shadow: 0 0 0 3px var(--bleu-pale); }
+    .grille-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .budget { display: grid; grid-template-columns: 1fr 100px; gap: 0.5rem; }
+
+    .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.5rem; }
+    .option input { position: absolute; opacity: 0; pointer-events: none; }
+    .option span { display: flex; gap: 0.65rem; align-items: flex-start; height: 100%; padding: 0.75rem 0.9rem; border-radius: 12px; border: 1px solid var(--trait); background: var(--chaux); cursor: pointer; }
+    .option span i { color: var(--bleu); margin-top: 0.25rem; width: 1.1rem; text-align: center; flex: none; }
+    .option input:checked + span { border-color: var(--bleu); background: var(--bleu-pale); box-shadow: inset 4px 0 0 var(--bleu); }
+    .option input:focus-visible + span { outline: 3px solid var(--bleu); outline-offset: 2px; }
+    .case { display: flex; gap: 0.6rem; align-items: flex-start; font-weight: 400; }
+    .case input { width: 18px; height: 18px; margin-top: 0.2rem; accent-color: var(--bleu); flex: none; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border: 0; border-radius: 10px; padding: 0.85rem 1.3rem; font-weight: 600; cursor: pointer; background: var(--bleu); color: #fff; }
+    .btn:hover { background: var(--bleu-fonce); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
+    .plus { border: 1px solid var(--trait); border-radius: 14px; padding: 0.8rem 1rem; }
+    .plus summary { cursor: pointer; font-weight: 600; color: var(--bleu); }
+    .plus[open] summary { margin-bottom: 0.9rem; }
+    .plus .grille-2 + .grille-2, .plus > div + div { margin-top: 0.9rem; }
+    .erreur { background: var(--terracotta-pale); color: #8f3a1b; border-radius: 10px; padding: 0.7rem 0.9rem; }
+
+    .merci h2 { font-size: 1.8rem; color: var(--bleu); line-height: 1.2; }
+    .merci p { margin-top: 0.6rem; color: var(--gris); }
+    .type { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding: 0.4rem 0.9rem; border-radius: 999px; background: var(--bleu-pale); color: var(--bleu-fonce); font-weight: 700; }
+    .type::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--type-color, var(--bleu)); }
+    .hotels { display: grid; gap: 0.75rem; margin-top: 1rem; }
+    .hotel { border: 1px solid var(--trait); border-radius: 14px; padding: 0.9rem 1rem; display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+    .hotel-nom { font-weight: 700; }
+    .hotel small { color: var(--gris); display: block; }
+    .hotel-prix { text-align: right; white-space: nowrap; font-weight: 700; color: var(--bleu-fonce); }
+    .hotel-prix small { font-weight: 400; }
+  </style>
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+</head>
+<body>
+  <header class="ciel">
+    <div class="ciel-inner">
+      <div class="haut">
+      <a class="logo" href="/questionnaire">
+        <svg width="28" height="34" viewBox="0 0 40 48" aria-hidden="true">
+          <path d="M4 46V20a16 16 0 0 1 32 0v26z" fill="#1f5fa8"/>
+          <path d="M11 46V22a9 9 0 0 1 18 0v24z" fill="#ffffff"/>
+          <path d="M14 46V24a6 6 0 0 1 12 0v22z" fill="#1f5fa8" opacity="0.85"/>
+        </svg>
+        <span class="marque">Jasmin</span>
+      </a>
+      <a class="retour" href="/" onclick="if (document.referrer.startsWith(location.origin) && history.length > 1) { history.back(); return false; }"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+      </div>
+      <h1>Créez votre persona voyageur</h1>
+      <p>Quelques questions, une minute. Votre persona jouera votre rôle dans nos simulations : nos conseillers s'entraîneront avec lui pour vous préparer le séjour idéal en Tunisie.</p>
+    </div>
+    <svg class="vague" viewBox="0 0 1440 34" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 18c120-14 240-14 360 0s240 14 360 0 240-14 360 0 240 14 360 0v16H0z" fill="#f6f1e7"/>
+    </svg>
+  </header>
+
+  <main>
+    <div class="carte" id="formulaire-carte">
+      <form id="persona-form" novalidate>
+        <div class="grille-2">
+          <div>
+            <label for="first_name">Votre nom</label>
+            <input class="champ" id="first_name" name="first_name" maxlength="60" required autocomplete="name" />
+          </div>
+          <div>
+            <label for="travelers">Nombre de personnes</label>
+            <input class="champ" type="number" id="travelers" name="travelers" min="1" max="12" value="2" required />
+          </div>
+        </div>
+
+        <div class="grille-2">
+          <div>
+            <label for="budget">Budget total <span class="aide">(vols et hôtel, pour tous)</span></label>
+            <div class="budget">
+              <input class="champ" type="number" id="budget" name="budget" min="1" step="1" required placeholder="Ex : 4500" />
+              <select class="champ" name="currency" aria-label="Devise">
+                <option value="TND">TND</option><option value="EUR">EUR</option><option value="USD">USD</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="destination">Destination</label>
+            <select class="champ" id="destination" name="destination" required>
+              <option value="">Choisir une destination</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grille-2">
+          <div>
+            <label for="start_date">Date d'arrivée</label>
+            <input class="champ" type="date" id="start_date" name="start_date" required />
+          </div>
+          <div>
+            <label for="end_date">Date de départ</label>
+            <input class="champ" type="date" id="end_date" name="end_date" required />
+          </div>
+        </div>
+
+        <div>
+          <span class="question" id="goal-label">Que cherchez-vous dans ce voyage ?</span>
+          <div class="options" id="goals" role="radiogroup" aria-labelledby="goal-label"></div>
+        </div>
+
+        <div>
+          <label for="notes">Autre chose à nous dire ? <span class="aide">(facultatif)</span></label>
+          <textarea class="champ" id="notes" name="notes" rows="3" maxlength="500" placeholder="Ex : anniversaire de mariage, mobilité réduite, régime alimentaire..." style="resize: vertical;"></textarea>
+        </div>
+
+        <details class="plus">
+          <summary>Pour un persona qui vous ressemble vraiment <span class="aide">(facultatif, 1 minute)</span></summary>
+          <div class="grille-2">
+            <div>
+              <label for="companions">Avec qui partez-vous ?</label>
+              <input class="champ" id="companions" name="companions" maxlength="200" placeholder="Ex : ma femme Amel et nos deux enfants" />
+            </div>
+            <div>
+              <label for="occasion">Pour quelle occasion ?</label>
+              <input class="champ" id="occasion" name="occasion" maxlength="200" placeholder="Ex : nos 10 ans de mariage" />
+            </div>
+          </div>
+          <div class="grille-2">
+            <div>
+              <label for="book_now_if">Qu'est-ce qui vous ferait réserver tout de suite ?</label>
+              <input class="champ" id="book_now_if" name="book_now_if" maxlength="200" placeholder="Ex : un transfert offert" />
+            </div>
+            <div>
+              <label for="walk_away_if">Qu'est-ce qui vous ferait renoncer ?</label>
+              <input class="champ" id="walk_away_if" name="walk_away_if" maxlength="200" placeholder="Ex : des frais découverts après coup" />
+            </div>
+          </div>
+          <div>
+            <label for="past_trip">Un voyage qui vous a marqué, en bien ou en mal ?</label>
+            <input class="champ" id="past_trip" name="past_trip" maxlength="300" placeholder="Ex : un hôtel bruyant à Sousse, on n'a pas dormi" />
+          </div>
+          <div>
+            <label for="address">Avec un conseiller, vous préférez</label>
+            <select class="champ" id="address" name="address">
+              <option value="vouvoie">le vouvoiement</option>
+              <option value="tutoie">le tutoiement</option>
+            </select>
+          </div>
+        </details>
+
+        <div class="grille-2">
+          <div>
+            <label for="email">Email <span class="aide">(pour accéder à votre espace)</span></label>
+            <input class="champ" type="email" id="email" name="email" maxlength="120" required autocomplete="email" />
+          </div>
+          <div>
+            <label for="password">Mot de passe <span class="aide">(8 caractères minimum)</span></label>
+            <input class="champ" type="password" id="password" name="password" minlength="8" maxlength="128" required autocomplete="new-password" />
+          </div>
+        </div>
+
+        <label class="case">
+          <input type="checkbox" name="consent" required />
+          <span>J'accepte que Jasmin crée un persona à partir de ces réponses pour former ses conseillers. Mon nom et mon email sont enregistrés, mon mot de passe est chiffré ; aucun téléphone n'est demandé.</span>
+        </label>
+
+        <div id="erreur" class="erreur" role="alert" hidden></div>
+
+        <div class="actions">
+          <a class="btn btn-contour" href="/" onclick="if (document.referrer.startsWith(location.origin) && history.length > 1) { history.back(); return false; }"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+          <button type="submit" class="btn" id="btn-envoyer"><i class="fa-solid fa-user-plus"></i> Créer mon persona</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="carte merci" id="merci" hidden aria-live="polite"></div>
+  </main>
+
+  <script>
+    // Choices mirror app/customers/twin.py (the server validates every value)
+    const DESTINATIONS = ["Hammamet", "Nabeul", "Sousse", "Monastir", "Mahdia", "Djerba", "Zarzis", "Tunis", "Gammarth", "Tozeur", "Douz", "Tabarka"];
+    const GOALS = [
+      ["detente", "fa-umbrella-beach", "Me détendre et profiter, je fais confiance à l'agence"],
+      ["sans_surprise", "fa-file-invoice-dollar", "Un séjour sans mauvaise surprise : j'ai déjà été déçu(e) par une agence"],
+      ["rassurer", "fa-shield-heart", "Être rassuré(e) : je m'inquiète facilement (sécurité, santé, annulation)"],
+      ["luxe", "fa-gem", "Le luxe et un service d'exception, sans compromis"],
+      ["garanties", "fa-clipboard-check", "Que chaque détail soit parfait, avec des garanties écrites"],
+      ["rapide", "fa-bolt", "Une offre claire et rapide, je n'ai pas beaucoup de temps"],
+      ["famille", "fa-children", "Des vacances réussies pour toute la famille, avec les enfants"],
+      ["conseils", "fa-compass", "Je ne sais pas encore, j'ai besoin de vos conseils"]
+    ];
+
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const form = document.getElementById("persona-form");
+
+    form.destination.append(...DESTINATIONS.map(d => new Option(d, d)));
+
+    // Dates: tomorrow at the earliest, default stay in a month for a week
+    const iso = d => d.toISOString().slice(0, 10);
+    const today = new Date();
+    const start = new Date(today.getTime() + 30 * 864e5);
+    form.start_date.min = iso(new Date(today.getTime() + 864e5));
+    form.start_date.value = iso(start);
+    form.end_date.value = iso(new Date(start.getTime() + 7 * 864e5));
+    form.start_date.addEventListener("change", () => { form.end_date.min = form.start_date.value; });
+    document.getElementById("goals").innerHTML = GOALS.map(([v, icon, label]) =>
+      `<label class="option"><input type="radio" name="trip_goal" value="${v}" required><span><i class="fa-solid ${icon}"></i>${label}</span></label>`).join("");
+
+    function showError(message) {
+      const box = document.getElementById("erreur");
+      box.textContent = message;
+      box.hidden = !message;
+    }
+
+    function formError() {
+      const invalid = [...form.querySelectorAll("input, select, textarea")].find(el => !el.checkValidity());
+      if (!invalid) return "";
+      invalid.focus();
+      if (invalid.name === "trip_goal") return "Choisissez ce que vous cherchez dans ce voyage.";
+      if (invalid.name === "consent") return "Cochez la case de consentement pour créer votre persona.";
+      return invalid.validationMessage || "Complétez les champs obligatoires.";
+    }
+
+    function datesError() {
+      const nights = (new Date(form.end_date.value) - new Date(form.start_date.value)) / 864e5;
+      if (!(nights > 0)) return "La date de départ doit être après la date d'arrivée.";
+      if (nights > 30) return "Le séjour ne peut pas dépasser 30 nuits.";
+      return "";
+    }
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const err = formError() || datesError();
+      if (err) return showError(err);
+      showError("");
+
+      const fd = new FormData(form);
+      const payload = {
+        first_name: fd.get("first_name"), travelers: +fd.get("travelers"),
+        budget: +fd.get("budget"), currency: fd.get("currency"),
+        destination: fd.get("destination"), start_date: fd.get("start_date"), end_date: fd.get("end_date"),
+        trip_goal: fd.get("trip_goal"),
+        notes: fd.get("notes") || null, consent: fd.get("consent") === "on",
+        companions: fd.get("companions") || null, occasion: fd.get("occasion") || null,
+        book_now_if: fd.get("book_now_if") || null, walk_away_if: fd.get("walk_away_if") || null,
+        past_trip: fd.get("past_trip") || null, address: fd.get("address"),
+        email: fd.get("email").trim(), password: fd.get("password")
+      };
+
+      const btn = document.getElementById("btn-envoyer");
+      btn.disabled = true;
+      try {
+        const res = await fetch("/api/v1/twins", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) {
+          const detail = Array.isArray(data.detail) ? data.detail.map(d => d.msg.replace(/^Value error, /, "")).join(" ") : data.detail;
+          throw new Error(detail || "Envoi impossible.");
+        }
+        showThanks(data);
+      } catch (error) {
+        showError(error.message || "Envoi impossible. Vérifiez votre connexion et réessayez.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function showThanks(data) {
+      const box = document.getElementById("merci");
+      box.innerHTML = `
+        <h2>Merci ${esc(data.first_name)}, votre persona est créé</h2>
+        <span class="type" style="--type-color: ${esc(data.archetype_color || "")};">Profil voyageur : ${esc(data.archetype_label)}</span>
+        <p>${esc(data.archetype_description || "")}</p>
+        <p>Votre persona va maintenant jouer votre rôle dans nos simulations : nos conseillers s'entraînent avec lui pour vous proposer le séjour qui vous correspond.</p>
+        <p style="margin-top: 1.25rem;">Suivez les conversations simulées avec votre persona dans votre espace client (identifiant : <b>${esc(data.email)}</b>).</p>
+        <p style="margin-top: 1rem;"><a href="/espace" style="color: var(--bleu); font-weight: 600;">Accéder à mon espace</a>
+          · <a href="/questionnaire" style="color: var(--bleu); font-weight: 600;">Créer un autre persona</a>
+          · <a href="/" style="color: var(--bleu); font-weight: 600;">Retour à l'accueil</a></p>`;
+      document.getElementById("formulaire-carte").hidden = true;
+      box.hidden = false;
+      box.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  </script>
+</body>
+</html>

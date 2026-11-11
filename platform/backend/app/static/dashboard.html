@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content Approval</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1a1d21; --muted:#6b7280; --line:#e2e5ea; --accent:#2563eb; --ok:#15803d; --bad:#b91c1c; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111317; --card:#1a1d23; --text:#e8eaed; --muted:#9aa0a9; --line:#2b2f37; --accent:#6ea0ff; --ok:#4ade80; --bad:#f87171; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, sans-serif; }
+  main { max-width:880px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:20px; margin:0 0 16px; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  input, textarea, select, button { font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:6px 10px; }
+  button { cursor:pointer; }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.danger { color:var(--bad); }
+  .tabs button.active { border-color:var(--accent); color:var(--accent); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  .meta { color:var(--muted); font-size:13px; margin-bottom:8px; display:flex; gap:12px; flex-wrap:wrap; }
+  textarea { width:100%; min-height:110px; resize:vertical; }
+  .media { display:flex; gap:8px; overflow-x:auto; margin:8px 0; }
+  .media img { height:120px; border-radius:6px; }
+  .media video { max-height:320px; border-radius:6px; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  .err { color:var(--bad); font-size:13px; margin-top:6px; }
+  .empty { color:var(--muted); text-align:center; padding:40px 0; }
+  .tags { color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Content approval</h1>
+  <p><a href="/calendar">Week calendar &amp; agent memory &rarr;</a> &middot; <a href="/leads">Leads</a></p>
+  <div class="bar">
+    <input id="biz" placeholder="business id" size="38">
+    <button id="load" class="primary">Load</button>
+    <span class="tabs" id="tabs"></span>
+  </div>
+  <details class="card" id="planner">
+    <summary><strong>Plan the week with AI</strong></summary>
+    <p class="tags">Give the main idea; the agent proposes the posts, days and times. Everything lands in Pending for your review.</p>
+    <textarea id="idea" placeholder="Main idea for the week, with the real facts (offer, destination, dates, prices you want mentioned)"></textarea>
+    <div class="actions">
+      <label>Week of <input id="weekStart" type="date"></label>
+      <label>Posts <input id="posts" type="number" min="1" max="14" value="5" style="width:64px"></label>
+      <label><input type="checkbox" id="pf" checked> Facebook</label>
+      <label><input type="checkbox" id="pi" checked> Instagram</label>
+      <label><input type="checkbox" id="tr" checked> Reels</label>
+      <label><input type="checkbox" id="ta"> Avatar clips</label>
+      <button id="plan" class="primary">Generate week</button>
+    </div>
+    <div class="err" id="planMsg"></div>
+  </details>
+  <div id="bulk"></div>
+  <div id="list"></div>
+</main>
+<script>
+const STATUSES = ["pending", "approved", "published", "failed", "rejected"];
+const $ = (id) => document.getElementById(id);
+let biz = new URLSearchParams(location.search).get("business") || "";
+let status = "pending";
+try { biz = biz || localStorage.getItem("biz") || ""; } catch (e) {}
+$("biz").value = biz;
+
+async function api(path, method = "GET", body) {
+  const res = await fetch(`/businesses/${biz}/content${path}`, {
+    method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || res.statusText);
+  return data;
+}
+
+function el(tag, props = {}, ...kids) {
+  const n = Object.assign(document.createElement(tag), props);
+  kids.flat().forEach((k) => n.append(k));
+  return n;
+}
+
+function renderTabs() {
+  const t = $("tabs"); t.replaceChildren();
+  STATUSES.forEach((s) => t.append(el("button", {
+    textContent: s, className: s === status ? "active" : "",
+    onclick: () => { status = s; load(); },
+  }), " "));
+}
+
+function localInputValue(iso) {
+  if (!iso) return "";
+  const d = new Date(iso); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+}
+
+function reelPanel(item, run) {
+  const hotel = el("input", { placeholder: "hotel name", size: 22 });
+  const dest = el("input", { placeholder: "destination", size: 16 });
+  const links = el("textarea", { placeholder: "optional: paste photo links (one per line) to register them for this hotel", style: "min-height:60px" });
+  const err = el("div", { className: "err" });
+  const guard = (fn, label, btn) => async () => {
+    err.textContent = ""; const old = btn.textContent; btn.disabled = true; btn.textContent = label;
+    try { await fn(); await load(); } catch (e) { err.textContent = e.message; }
+    btn.disabled = false; btn.textContent = old;
+  };
+  const find = el("button", { textContent: "Attach photos" });
+  find.onclick = guard(async () => {
+    const urls = links.value.split(/\r?\n/).map((u) => u.trim()).filter(Boolean);
+    if (urls.length) {
+      const r = await fetch("/assets/manual", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hotel_name: hotel.value, destination: dest.value, photo_urls: urls }) });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || "could not register photos");
+    }
+    await api(`/${item.id}/attach-photos`, "POST", { hotel_name: hotel.value, destination: dest.value });
+  }, "Attaching…", find);
+  const render = el("button", { className: "primary", textContent: item.video_url ? "Re-render reel" : "Render reel" });
+  render.disabled = !item.photo_urls.length;
+  render.onclick = guard(() => api(`/${item.id}/render`, "POST"), "Rendering… (about a minute)", render);
+  return el("div", { className: "avatar" },
+    el("div", { className: "meta", textContent: `Reel media · ${item.photo_urls.length} photo(s) attached` }),
+    el("div", { className: "actions" }, hotel, dest), links,
+    el("div", { className: "actions" }, find, render), err);
+}
+
+function avatarPanel(item, run) {
+  const box = el("div", { className: "avatar" });
+  const lang = el("select", {}, el("option", { value: "tn", textContent: "Tunisian (I dictate)" }),
+    el("option", { value: "fr", textContent: "French (agent writes it)" }));
+  lang.value = item.avatar_language || "tn";
+  const transcript = el("textarea", { value: item.avatar_text || "", dir: "auto", placeholder: "Transcript appears here after you record" });
+  const approved = item.avatar_transcript_status === "approved";
+  const generating = !!item.avatar_job_id && !item.video_url;
+  const err = el("div", { className: "err" });
+  const guard = (fn) => async () => { err.textContent = ""; try { await fn(); } catch (e) { err.textContent = e.message; } };
+
+  let recorder = null, chunks = [];
+  const rec = el("button", { textContent: "Record script" });
+  rec.onclick = guard(async () => {
+    if (recorder) { recorder.stop(); return; }
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    chunks = []; recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+    recorder.onstop = guard(async () => {
+      stream.getTracks().forEach((t) => t.stop());
+      const blob = new Blob(chunks, { type: recorder.mimeType }); recorder = null;
+      rec.textContent = "Transcribing…"; rec.disabled = true;
+      try {
+        const res = await fetch(`/businesses/${biz}/content/${item.id}/avatar/dictation`, { method: "POST", headers: { "Content-Type": blob.type }, body: blob });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.detail || res.statusText);
+        await load();
+      } finally { rec.textContent = "Record script"; rec.disabled = false; }
+    });
+    recorder.start(); rec.textContent = "Stop recording";
+  });
+
+  const tn = lang.value === "tn";
+  const saveTranscript = (approve) => run(() => api(`/${item.id}/avatar/transcript`, "POST", { transcript: transcript.value, approve }));
+  const start = el("button", { className: "primary", textContent: generating ? "Check video status" : "Generate video" });
+  start.onclick = run(() => generating
+    ? api(`/${item.id}/avatar/refresh`, "POST")
+    : api(`/${item.id}/avatar?language=${lang.value}`, "POST"));
+
+  box.append(el("div", { className: "meta", textContent: "Avatar clip" }),
+    el("div", { className: "actions" }, lang));
+  if (lang.value === "tn") {
+    box.append(transcript, el("div", { className: "actions" }, rec,
+      el("button", { textContent: approved ? "Transcript approved ✓ (save edits)" : "Approve transcript", className: approved ? "" : "primary", onclick: saveTranscript(true) })));
+    start.disabled = !approved && !generating;
+  }
+  lang.onchange = () => { box.replaceWith(avatarPanel({ ...item, avatar_language: lang.value }, run)); };
+  box.append(el("div", { className: "actions" }, start), err);
+  return box;
+}
+
+function card(item) {
+  const caption = el("textarea", { value: item.caption || "" });
+  const when = el("input", { type: "datetime-local", value: localInputValue(item.scheduled_for) });
+  const err = el("div", { className: "err" });
+  const run = (fn) => async () => { err.textContent = ""; try { await fn(); await load(); } catch (e) { err.textContent = e.message; } };
+  const resolve = (decision) => run(() => api(`/${item.id}/resolve`, "POST", {
+    decision, edited_caption: caption.value,
+    scheduled_for: when.value ? new Date(when.value).toISOString() : null,
+  }));
+
+  const media = el("div", { className: "media" });
+  if (item.video_url) media.append(el("video", { src: item.video_url, controls: true }));
+  item.photo_urls.forEach((u) => media.append(el("img", { src: u, loading: "lazy" })));
+
+  const actions = el("div", { className: "actions" });
+  if (item.status === "pending") {
+    actions.append(
+      el("label", {}, "Publish at ", when),
+      el("button", { className: "primary", textContent: "Approve", onclick: resolve("approve") }),
+      el("button", { className: "danger", textContent: "Reject", onclick: resolve("reject") }),
+      el("button", { textContent: "Suggest time", onclick: run(() => api(`/${item.id}/suggest-schedule`, "POST")) }),
+    );
+  } else if (item.status === "approved") {
+    actions.append(el("button", { className: "primary", textContent: "Publish now", onclick: run(() => api(`/${item.id}/publish-now`, "POST")) }));
+  } else if (item.status === "failed") {
+    actions.append(el("button", { textContent: "Retry", onclick: run(() => api(`/${item.id}/retry`, "POST")) }));
+  }
+  if (item.publish_error) err.textContent = item.publish_error;
+
+  return el("div", { className: "card" },
+    el("div", { className: "meta" }, el("span", { textContent: `${item.platform} · ${item.type}` }),
+      el("span", { textContent: item.scheduled_for ? "scheduled " + new Date(item.scheduled_for).toLocaleString() : "no time set" })),
+    item.status === "pending" ? caption : el("p", { textContent: item.caption || "" }),
+    el("div", { className: "tags", textContent: item.hashtags.map((h) => "#" + h.replace(/^#/, "")).join(" ") }),
+    media, item.type === "avatar_clip" && item.status === "pending" ? avatarPanel(item, run) : "",
+    item.type === "reel" && item.status === "pending" ? reelPanel(item, run) : "", actions, err);
+}
+
+async function load() {
+  biz = $("biz").value.trim();
+  try { localStorage.setItem("biz", biz); } catch (e) {}
+  renderTabs();
+  const list = $("list"); list.replaceChildren(); $("bulk").replaceChildren();
+  if (!biz) return list.append(el("div", { className: "empty", textContent: "Enter a business id" }));
+  try {
+    const items = await api(`?status=${status}`);
+    if (!items.length) list.append(el("div", { className: "empty", textContent: `No ${status} items` }));
+    items.forEach((i) => list.append(card(i)));
+    const ready = status === "pending" ? items.filter((i) => i.scheduled_for && i.type === "static_post") : [];
+    if (ready.length) $("bulk").append(el("button", {
+      className: "primary", textContent: `Approve all ${ready.length} scheduled text posts`,
+      onclick: async () => { for (const i of ready) await api(`/${i.id}/resolve`, "POST", { decision: "approve" }); await load(); },
+    }));
+  } catch (e) { list.append(el("div", { className: "err", textContent: e.message })); }
+}
+
+$("plan").onclick = async () => {
+  const msg = $("planMsg"); msg.style.color = ""; msg.textContent = "";
+  biz = $("biz").value.trim();
+  $("plan").disabled = true; $("plan").textContent = "Generating... (can take a minute)";
+  try {
+    const r = await api("/plan-week", "POST", {
+      main_idea: $("idea").value, week_start: $("weekStart").value || null, posts: +$("posts").value,
+      platforms: [$("pf").checked && "facebook", $("pi").checked && "instagram"].filter(Boolean),
+      content_types: ["static_post", $("tr").checked && "reel", $("ta").checked && "avatar_clip"].filter(Boolean),
+    });
+    msg.style.color = "var(--ok)";
+    msg.textContent = `Created ${r.created.length} posts for the week of ${r.week_start}` + (r.failed.length ? `, ${r.failed.length} failed: ${r.failed[0].error}` : "");
+    status = "pending"; await load();
+  } catch (e) { msg.textContent = e.message; }
+  $("plan").disabled = false; $("plan").textContent = "Generate week";
+};
+
+$("load").onclick = load;
+load();
+</script>
+</body>
+</html>

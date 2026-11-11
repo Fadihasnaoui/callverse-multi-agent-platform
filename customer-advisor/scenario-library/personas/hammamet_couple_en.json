@@ -1,0 +1,17 @@
+{
+  "name": "Couple in Hammamet (English, details step by step)",
+  "language": "en",
+  "opening": "Hello, I'm looking for a hotel in Hammamet.",
+  "opening_covers": ["destination"],
+  "answers": {
+    "hotel_choice": "Please recommend the best hotels you have.",
+    "dates": "From 20/11/2026 to 23/11/2026.",
+    "adults": "We are 2 adults.",
+    "children": "No children.",
+    "board": "Half board if possible.",
+    "budget": "Our budget is around 1000 dinars."
+  },
+  "follow_ups": ["Which one is the cheapest?"],
+  "decline_contact": "Thank you, I'll think about it and get back to you.",
+  "closing": "Thank you very much for your help, goodbye."
+}

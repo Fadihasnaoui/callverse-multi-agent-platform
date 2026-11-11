@@ -1,0 +1,46 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credential*
+*secret*
+
+# Runtime data and databases
+data/
+artifacts/
+reports/
+snapshots/
+deliverables/
+uploads/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Generated and local tooling files
+node_modules/
+dist/
+build/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
+
+# Operational deployment configuration is intentionally private
+docker-compose*.yml
+Dockerfile
+Caddyfile
+*.local.yml
+
+# A helper that rewrites a provider key in a local configuration file
+quality-analyst/scripts/Configure-GeminiSecret.ps1

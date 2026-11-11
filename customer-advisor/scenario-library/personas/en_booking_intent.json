@@ -1,0 +1,17 @@
+{
+  "name": "EN 5 - Wants to book, then refuses to give contact details",
+  "language": "en",
+  "opening": "Hello, I need a hotel in Monastir for 2 adults from 15/12/2026 to 17/12/2026.",
+  "opening_covers": ["destination", "dates", "adults"],
+  "answers": {
+    "hotel_choice": "Please recommend the best ones.",
+    "dates": "From 15/12/2026 to 17/12/2026.",
+    "adults": "2 adults.",
+    "children": "No children.",
+    "board": "Half board.",
+    "budget": "Around 900 dinars."
+  },
+  "follow_ups": ["I'd like to book the first one.", "I'll take the first offer."],
+  "decline_contact": "Actually, I prefer not to share my phone number now. I'll call you back.",
+  "closing": "Thank you, goodbye."
+}

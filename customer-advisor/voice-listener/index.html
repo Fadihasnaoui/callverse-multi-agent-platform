@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ozone Call Listener</title>
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2.5.7/dist/livekit-client.umd.min.js"></script>
+<style>
+  :root { --bg:#0f1115; --panel:#181b22; --text:#e8eaf0; --muted:#8a90a0; --client:#5aa9ff; --advisor:#f0a35a; --line:#262a33; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:24px 16px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .room { color:var(--muted); font-size:13px; margin-bottom:20px; }
+  .speakers { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+  .speaker { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; transition:border-color .15s, box-shadow .15s; }
+  .speaker .name { font-weight:600; }
+  .speaker .state { color:var(--muted); font-size:13px; }
+  .speaker.client.talking { border-color:var(--client); box-shadow:0 0 0 2px color-mix(in srgb, var(--client) 35%, transparent); }
+  .speaker.advisor.talking { border-color:var(--advisor); box-shadow:0 0 0 2px color-mix(in srgb, var(--advisor) 35%, transparent); }
+  button { background:var(--text); color:var(--bg); border:0; border-radius:10px; padding:12px 20px; font-weight:600; font-size:15px; cursor:pointer; width:100%; margin-bottom:16px; }
+  button:disabled { opacity:.5; cursor:default; }
+  .status { color:var(--muted); font-size:13px; margin-bottom:12px; min-height:20px; }
+  .log { display:flex; flex-direction:column; gap:10px; }
+  .line { background:var(--panel); border-left:3px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .line.client { border-left-color:var(--client); }
+  .line.advisor { border-left-color:var(--advisor); }
+  .line .who { font-size:12px; font-weight:600; color:var(--muted); margin-bottom:2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Simulated call</h1>
+  <div class="room" id="room"></div>
+  <button id="join">Join and listen</button>
+  <div class="status" id="status">Click to join. The call starts as soon as you are connected.</div>
+  <div class="speakers">
+    <div class="speaker client" id="sp-client"><div class="name">Client</div><div class="state">waiting</div></div>
+    <div class="speaker advisor" id="sp-amira"><div class="name">Amira · Ozone Voyages</div><div class="state">waiting</div></div>
+  </div>
+  <div class="log" id="log"></div>
+</main>
+<script>
+  const LK = window.LivekitClient;
+  const $ = (id) => document.getElementById(id);
+  const missing = "No call running. Start one with: python scripts/call_orchestrator.py --persona hammamet_family_fr --audio livekit, then use the page it opens (http://127.0.0.1:8765).";
+
+  // The orchestrator serves this page and hands out a fresh token per load.
+  async function loadConfig() {
+    if (location.protocol === "file:") return null;
+    try {
+      const response = await fetch("config.json", { cache: "no-store" });
+      return response.ok ? await response.json() : null;
+    } catch {
+      return null;
+    }
+  }
+  let config = null;
+  loadConfig().then((value) => {
+    config = value;
+    $("room").textContent = config ? "Room: " + config.room : missing;
+    $("join").disabled = !config;
+  });
+  $("join").disabled = true;
+
+  function setState(identity, text, talking) {
+    const card = $("sp-" + identity);
+    if (!card) return;
+    card.querySelector(".state").textContent = text;
+    card.classList.toggle("talking", talking);
+  }
+
+  $("join").onclick = async () => {
+    $("join").disabled = true;
+    $("status").textContent = "Connecting…";
+    const room = new LK.Room();
+    room.on(LK.RoomEvent.TrackSubscribed, (track, _pub, participant) => {
+      if (track.kind !== "audio") return;
+      document.body.appendChild(track.attach());
+      setState(participant.identity, "connected", false);
+    });
+    room.on(LK.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+      const active = new Set(speakers.map((p) => p.identity));
+      for (const id of ["client", "amira"]) setState(id, active.has(id) ? "speaking…" : "connected", active.has(id));
+    });
+    room.on(LK.RoomEvent.DataReceived, (payload, _participant, _kind, topic) => {
+      if (topic !== "transcript") return;
+      const { speaker, text } = JSON.parse(new TextDecoder().decode(payload));
+      const line = document.createElement("div");
+      line.className = "line " + speaker;
+      line.innerHTML = '<div class="who"></div><div class="text"></div>';
+      line.querySelector(".who").textContent = speaker === "client" ? "Client" : "Amira";
+      line.querySelector(".text").textContent = text;
+      $("log").appendChild(line);
+      line.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+    room.on(LK.RoomEvent.Disconnected, () => { $("status").textContent = "Call ended."; });
+    try {
+      await room.connect(config.url, config.token);
+      await room.startAudio();
+      $("status").textContent = "Connected. Listening…";
+    } catch (error) {
+      $("status").textContent = "Could not connect: " + error.message;
+      $("join").disabled = false;
+    }
+  };
+</script>
+</body>
+</html>

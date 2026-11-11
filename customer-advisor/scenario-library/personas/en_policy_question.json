@@ -1,0 +1,17 @@
+{
+  "name": "EN 4 - Policy questions after the offers (Djerba)",
+  "language": "en",
+  "opening": "Hi, I'm looking for a hotel in Djerba for 2 adults from 08/12/2026 to 11/12/2026.",
+  "opening_covers": ["destination", "dates", "adults"],
+  "answers": {
+    "hotel_choice": "Recommend me some hotels please.",
+    "dates": "From 08/12/2026 to 11/12/2026.",
+    "adults": "2 adults.",
+    "children": "No children.",
+    "board": "All inclusive.",
+    "budget": "Around 1200 dinars."
+  },
+  "follow_ups": ["Can I cancel the reservation for free?", "How can I pay?"],
+  "decline_contact": "Thanks, I'll think about it.",
+  "closing": "Okay, thank you for the information. Bye."
+}

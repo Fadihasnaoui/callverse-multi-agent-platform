@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leads</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1a1d21; --muted:#6b7280; --line:#e2e5ea; --accent:#2563eb; --ok:#15803d; --bad:#b91c1c; --warn:#b45309; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111317; --card:#1a1d23; --text:#e8eaed; --muted:#9aa0a9; --line:#2b2f37; --accent:#6ea0ff; --ok:#4ade80; --bad:#f87171; --warn:#fbbf24; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, sans-serif; }
+  main { max-width:880px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:20px; margin:0 0 4px; } a { color:var(--accent); }
+  input, button { font:inherit; color:inherit; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:6px 10px; }
+  button { cursor:pointer; } button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.good { color:var(--ok); border-color:var(--ok); } button.bad { color:var(--bad); border-color:var(--bad); }
+  button.active { border-color:var(--accent); color:var(--accent); }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:12px 0; }
+  .muted { color:var(--muted); font-size:13px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .meta { color:var(--muted); font-size:13px; display:flex; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+  .msg { font-size:16px; margin:4px 0 8px; white-space:pre-wrap; }
+  .score { display:inline-block; min-width:44px; text-align:center; border-radius:10px; padding:0 8px; font-size:12px; color:#fff; background:var(--muted); }
+  .score.hi { background:var(--ok); } .score.mid { background:var(--warn); }
+  .tag { font-size:12px; border:1px solid var(--line); border-radius:10px; padding:0 8px; }
+  .tag.sale { color:var(--ok); border-color:var(--ok); }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .err { color:var(--bad); font-size:13px; min-height:18px; }
+  .empty { color:var(--muted); text-align:center; padding:40px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Leads</h1>
+  <div class="muted"><a href="/dashboard">&larr; Approval dashboard</a> &middot; <a href="/calendar">Week calendar</a> &middot; Your answers teach the agent what a real lead looks like.</div>
+  <div class="bar">
+    <input id="biz" placeholder="business id" size="38">
+    <button id="load" class="primary">Load</button>
+    <span id="tabs"></span>
+  </div>
+  <div class="err" id="err"></div>
+  <div id="list"></div>
+</main>
+<script>
+const TABS = [["new", "Real leads"], ["ignored", "Ignored (low intent)"], ["", "All"]];
+const $ = (id) => document.getElementById(id);
+let biz = "", tab = "new";
+try { biz = localStorage.getItem("biz") || ""; } catch (e) {}
+$("biz").value = biz;
+
+function el(tag, props = {}, ...kids) {
+  const n = Object.assign(document.createElement(tag), props);
+  kids.flat().forEach((k) => n.append(k));
+  return n;
+}
+async function call(path, method = "GET", body) {
+  const res = await fetch(`/businesses/${biz}${path}`, { method, headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail || res.statusText);
+  return data;
+}
+const guard = (fn) => async () => { $("err").textContent = ""; try { await fn(); await load(); } catch (e) { $("err").textContent = e.message; } };
+
+function card(l) {
+  const score = l.intent_confidence;
+  const actions = el("div", { className: "actions" });
+  if (l.status === "ignored") {
+    actions.append(el("button", { className: "good", textContent: "This IS a lead", onclick: guard(() => call(`/leads/${l.id}/feedback`, "POST", { is_lead: true })) }));
+  } else {
+    actions.append(el("button", { className: "bad", textContent: "Not a lead", onclick: guard(() => call(`/leads/${l.id}/feedback`, "POST", { is_lead: false })) }));
+    if (!l.converted) {
+      const amount = el("input", { type: "number", min: "0", step: "1", placeholder: "TND", style: "width:90px" });
+      actions.append(amount, el("button", { className: "primary", textContent: "Became a sale", onclick: guard(() =>
+        call("/conversions", "POST", { lead_id: l.id, value_amount: amount.value ? +amount.value : null })) }));
+    }
+  }
+  return el("div", { className: "card" },
+    el("div", { className: "meta" },
+      el("span", { textContent: `${l.platform} · ${l.source}` }),
+      el("span", { textContent: l.author_name || "unknown" }),
+      el("span", { textContent: new Date(l.created_at).toLocaleString() }),
+      score == null ? "" : el("span", { className: "score " + (score >= 70 ? "hi" : score >= 50 ? "mid" : ""), textContent: score, title: "Agent's buying-intent score" }),
+      l.converted ? el("span", { className: "tag sale", textContent: "sale" }) : ""),
+    el("div", { className: "msg", textContent: l.message_text || "", dir: "auto" }),
+    l.source_caption ? el("div", { className: "muted", textContent: "From post: " + l.source_caption }) : "",
+    actions);
+}
+
+async function load() {
+  biz = $("biz").value.trim(); try { localStorage.setItem("biz", biz); } catch (e) {}
+  const t = $("tabs"); t.replaceChildren();
+  TABS.forEach(([v, label]) => t.append(el("button", { textContent: label, className: v === tab ? "active" : "", onclick: () => { tab = v; load(); } }), " "));
+  const list = $("list"); list.replaceChildren();
+  if (!biz) return list.append(el("div", { className: "empty", textContent: "Enter a business id" }));
+  try {
+    const rows = await call("/leads" + (tab ? `?status=${tab}` : ""));
+    if (!rows.length) list.append(el("div", { className: "empty", textContent: "No leads here yet" }));
+    rows.forEach((l) => list.append(card(l)));
+  } catch (e) { $("err").textContent = e.message; }
+}
+$("load").onclick = load;
+load();
+</script>
+</body>
+</html>

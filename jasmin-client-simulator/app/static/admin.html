@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jasmin | Dashboard Admin</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Marcellus&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+      /* Jasmin Voyages: sable, chaux, bleu Sidi Bou Saïd */
+      --bg-dark: #f6f1e7;
+      --bg-card: #ffffff;
+      --accent-primary: #1f5fa8;
+      --accent-hover: #174a85;
+      --accent-pale: #e9f1fb;
+      --text-main: #1e2a3a;
+      --text-secondary: #3b4a5c;
+      --text-muted: #5b6878;
+      --border-color: #e6dccb;
+      --grid-color: #efe8db;
+      --glass-bg: #ffffff;
+      --track: #ece3d2;
+      /* Archetype colors come from app/customers/archetypes.py (validated for CVD and >= 3:1 contrast on white) */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Figtree', system-ui, sans-serif; }
+    h2, .brand-name { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+    :focus-visible { outline: 3px solid var(--accent-primary); outline-offset: 2px; }
+
+    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+      padding: 1rem max(1rem, 2vw);
+      padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+      background: var(--glass-bg);
+      border-bottom: 3px solid var(--accent-primary);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit; }
+    .brand-name { font-size: 1.45rem; color: var(--accent-primary); line-height: 1.1; display: block; }
+    .brand small { display: block; color: var(--text-muted); font-size: 0.8rem; }
+    .nav-actions { display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 0.5rem 0.95rem; border-radius: 10px;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .btn:hover { border-color: var(--text-muted); }
+    .btn[aria-pressed="true"] { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
+
+    main { max-width: 1400px; margin: 0 auto; padding: 1.5rem max(1rem, 2vw) 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    /* flex/grid children default to min-width:auto, which lets the wide table push the page sideways */
+    main > *, #dashboard > *, .arch-grid > * { min-width: 0; }
+
+    h2 { font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    h2 i { color: var(--accent-primary); font-size: 1rem; }
+    .subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+    .panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem; }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .kpi-value { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent-primary); }
+    .kpi-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+    .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; }
+    .arch-card { border-top: 4px solid var(--arch-color); display: flex; flex-direction: column; }
+    .arch-title { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .arch-name { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; }
+    .swatch { width: 10px; height: 10px; border-radius: 50%; background: var(--arch-color); flex: none; }
+    .difficulty { font-size: 0.76rem; color: var(--text-muted); background: var(--bg-dark); border-radius: 9999px; padding: 0.15rem 0.55rem; }
+    .arch-count { font-size: 1.75rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 0.6rem; }
+    .arch-count small { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-left: 0.35rem; }
+    .mini-chart { position: relative; height: 130px; margin-top: 0.75rem; }
+    .mini-empty { height: 130px; margin-top: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 0.6rem; }
+    .stat-rows { margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.84rem; }
+    .stat-row { display: flex; justify-content: space-between; gap: 0.75rem; color: var(--text-secondary); }
+    .stat-row b { color: var(--text-main); font-variant-numeric: tabular-nums; }
+    .quality { margin-top: auto; padding-top: 0.85rem; font-size: 0.78rem; color: var(--text-muted); }
+    .quality-inner { border-top: 1px solid var(--border-color); padding-top: 0.75rem; }
+    .quality-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-top: 0.4rem; text-align: center; }
+    .quality-list b { display: block; font-size: 1rem; color: var(--text-main); font-variant-numeric: tabular-nums; }
+
+    .chart-box { position: relative; height: 300px; }
+    .toggle-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 0.65rem 0.75rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+    th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .tag { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-secondary); }
+
+    #status-msg { color: var(--text-muted); text-align: center; padding: 3rem 0; }
+  </style>
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/" aria-label="Jasmin, retour au simulateur">
+      <svg width="34" height="40" viewBox="0 0 40 48" aria-hidden="true">
+        <path d="M4 46V20a16 16 0 0 1 32 0v26z" fill="#1f5fa8"/>
+        <path d="M11 46V22a9 9 0 0 1 18 0v24z" fill="#ffffff"/>
+        <path d="M14 46V24a6 6 0 0 1 12 0v22z" fill="#1f5fa8" opacity="0.85"/>
+      </svg>
+      <span><span class="brand-name">Jasmin</span><small>Dashboard Admin, suivi des clientèles</small></span>
+    </a>
+    <div class="nav-actions">
+      <span id="nav-user" style="color: var(--text-muted);"></span>
+      <a class="btn" href="/"><i class="fa-solid fa-arrow-left"></i> Retour au simulateur</a>
+    </div>
+  </nav>
+
+  <main>
+    <div id="status-msg">Chargement des statistiques...</div>
+
+    <div id="dashboard" style="display: none; flex-direction: column; gap: 1.5rem;">
+      <!-- KPIs -->
+      <section class="kpi-grid" id="kpis"></section>
+
+      <!-- Per-archetype cards, each with its own curve (small multiples, shared 0-10 scale) -->
+      <section>
+        <div class="section-head">
+          <div>
+            <h2><i class="fa-solid fa-users"></i> Types de clientèle</h2>
+            <p class="subtitle" id="arch-subtitle"></p>
+          </div>
+          <div>
+            <p class="subtitle" style="margin: 0 0 0.35rem;">Courbe moyenne par tour de conversation :</p>
+            <div class="toggle-row" role="group" aria-label="Indicateur affiché dans les courbes">
+              <button class="btn" data-metric="trust_level" aria-pressed="true">Confiance</button>
+              <button class="btn" data-metric="interest_level" aria-pressed="false">Intérêt</button>
+              <button class="btn" data-metric="booking_intention" aria-pressed="false">Intention</button>
+            </div>
+          </div>
+        </div>
+        <div class="arch-grid" id="arch-cards"></div>
+      </section>
+
+      <!-- Daily activity -->
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <h2><i class="fa-solid fa-calendar-days"></i> Simulations par jour</h2>
+            <p class="subtitle">30 derniers jours, empilées par type de client</p>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="chart-daily" role="img" aria-label="Barres empilées du nombre de simulations par jour et par type de client"></canvas></div>
+      </section>
+
+      <!-- Clients table -->
+      <section class="panel">
+        <div class="section-head">
+          <div>
+            <h2><i class="fa-solid fa-address-book"></i> Tous les clients</h2>
+            <p class="subtitle">Scores finaux moyens sur l'ensemble de leurs simulations</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Client</th><th>Connexion</th><th>Type</th><th class="num">Budget</th><th class="num">Simulations</th>
+                <th class="num">Confiance finale</th><th class="num">Intention finale</th>
+              </tr>
+            </thead>
+            <tbody id="clients-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const QUALITY_LABELS = { poor: "Faible", neutral: "Neutre", good: "Bon", excellent: "Excellent" };
+    const METRIC_LABELS = { trust_level: "Confiance", interest_level: "Intérêt", booking_intention: "Intention" };
+
+    const css = getComputedStyle(document.documentElement);
+    const token = name => css.getPropertyValue(name).trim();
+    const fmt = (v, digits = 1) => v == null ? "—" : Number(v).toFixed(digits);
+    const pct = v => v == null ? "—" : `${Math.round(v * 100)}%`;
+
+    let overview = null;
+    let archByKey = {};
+    const miniCharts = {};
+
+    const tooltipStyle = () => ({
+      backgroundColor: "#1e2a3a", borderColor: "#1e2a3a", borderWidth: 1,
+      titleColor: "#ffffff", bodyColor: "#e6dccb", padding: 10, usePointStyle: true
+    });
+
+    function renderKpis(t) {
+      const tiles = [
+        ["Clients au total", t.clients],
+        ["Jumeaux (questionnaire)", t.twins],
+        ["Simulations", t.simulations],
+        ["Confiance finale moyenne", t.avg_trust == null ? "—" : `${fmt(t.avg_trust)} / 10`],
+        ["Taux de conversion (réservé ou option)", pct(t.conversion_rate)]
+      ];
+      document.getElementById("kpis").innerHTML = tiles.map(([label, value]) => `
+        <div class="panel"><div class="kpi-value">${value}</div><div class="kpi-label">${label}</div></div>
+      `).join("");
+    }
+
+    function renderArchetypeCards(list, totalClients) {
+      document.getElementById("arch-subtitle").textContent =
+        `${list.length} types · répartition des ${totalClients} clients et performance des simulations`;
+      document.getElementById("arch-cards").innerHTML = list.map(a => {
+        const share = totalClients ? Math.round(a.clients * 100 / totalClients) : 0;
+        return `
+          <div class="panel arch-card" style="--arch-color: ${a.color};">
+            <div class="arch-title">
+              <span class="arch-name"><span class="swatch"></span>${a.label}</span>
+              <span class="difficulty">${a.difficulty}</span>
+            </div>
+            <div class="arch-count">${a.clients}<small>clients · ${share}% du total</small></div>
+            <div id="mini-${a.archetype}"></div>
+            <div class="stat-rows">
+              <div class="stat-row"><span>Simulations (terminées)</span><b>${a.simulations} (${a.completed})</b></div>
+              <div class="stat-row"><span>Confiance finale moy.</span><b>${fmt(a.avg_trust)} / 10</b></div>
+              <div class="stat-row"><span>Intérêt final moy.</span><b>${fmt(a.avg_interest)} / 10</b></div>
+              <div class="stat-row"><span>Intention finale moy.</span><b>${fmt(a.avg_intent)} / 10</b></div>
+              <div class="stat-row"><span>Taux de conversion</span><b>${pct(a.conversion_rate)}</b></div>
+              <div class="stat-row"><span>Issues</span><b>${Object.entries(a.outcomes || {}).filter(([, n]) => n)
+                .map(([k, n]) => `${overview.outcome_labels[k]} ${n}`).join(" · ") || "—"}</b></div>
+            </div>
+            <div class="quality"><div class="quality-inner">
+              Qualité du vendeur détectée (nombre de tours)
+              <div class="quality-list">
+                ${Object.entries(QUALITY_LABELS).map(([k, label]) => `<div><b>${a.quality[k]}</b>${label}</div>`).join("")}
+              </div>
+            </div></div>
+          </div>`;
+      }).join("");
+    }
+
+    function renderMiniCharts(metric) {
+      // Shared x-range across cards so the small multiples line up
+      const maxLen = Math.max(1, ...Object.values(overview.curves[metric]).map(c => c.length));
+      const labels = Array.from({ length: maxLen }, (_, i) => i === 0 ? "Accueil" : `T${i}`);
+
+      overview.archetypes.forEach(a => {
+        const slot = document.getElementById(`mini-${a.archetype}`);
+        const data = overview.curves[metric][a.archetype];
+        if (!data.length) {
+          slot.innerHTML = `<div class="mini-empty">Aucune simulation pour ce type</div>`;
+          return;
+        }
+        const padded = labels.map((_, i) => data[i] ?? null);
+        if (miniCharts[a.archetype]) {
+          const chart = miniCharts[a.archetype];
+          chart.data.labels = labels;
+          chart.data.datasets[0].data = padded;
+          chart.data.datasets[0].label = METRIC_LABELS[metric];
+          chart.update();
+          return;
+        }
+        slot.innerHTML = `<div class="mini-chart"><canvas role="img" aria-label="Courbe moyenne par tour, type ${a.label}"></canvas></div>`;
+        miniCharts[a.archetype] = new Chart(slot.querySelector("canvas"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [{
+              label: METRIC_LABELS[metric], data: padded, archetype: a.archetype,
+              borderColor: a.color, backgroundColor: a.color, borderWidth: 2, tension: 0,
+              pointRadius: 3, pointHoverRadius: 5, pointHitRadius: 12,
+              pointHoverBorderWidth: 2, pointHoverBorderColor: token("--bg-card")
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: token("--text-muted"), font: { size: 10 }, maxRotation: 0, autoSkipPadding: 8 } },
+              y: { min: 0, max: 10, grid: { color: token("--grid-color") }, border: { display: false }, ticks: { color: token("--text-muted"), font: { size: 10 }, stepSize: 5 } }
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                ...tooltipStyle(),
+                callbacks: {
+                  label: ctx => {
+                    const n = overview.curve_counts[ctx.dataset.archetype][ctx.dataIndex] ?? 0;
+                    return ` ${ctx.dataset.label} : ${fmt(ctx.parsed.y)} / 10  (n = ${n})`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      });
+    }
+
+    function renderDailyChart(daily) {
+      const labels = daily.dates.map(d => new Date(d + "T00:00:00").toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }));
+      const datasets = overview.archetypes.map(a => ({
+        label: a.label, data: daily[a.archetype],
+        backgroundColor: a.color,
+        borderColor: token("--bg-card"), borderWidth: { top: 2 },  // 2px surface gap between stacked segments
+        borderRadius: 2, borderSkipped: "bottom", maxBarThickness: 22
+      }));
+      new Chart(document.getElementById("chart-daily"), {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { color: token("--text-muted"), maxRotation: 0, autoSkipPadding: 12 } },
+            y: { stacked: true, beginAtZero: true, grid: { color: token("--grid-color") }, border: { display: false }, ticks: { color: token("--text-muted"), precision: 0 }, title: { display: true, text: "Simulations", color: token("--text-muted") } }
+          },
+          plugins: {
+            legend: { position: "top", align: "start", labels: { color: token("--text-secondary"), usePointStyle: true, pointStyle: "rectRounded", boxWidth: 10 } },
+            tooltip: {
+              ...tooltipStyle(),
+              filter: item => item.parsed.y > 0,
+              callbacks: { label: ctx => ` ${ctx.dataset.label} : ${ctx.parsed.y}` }
+            }
+          }
+        }
+      });
+    }
+
+    function renderClients(clients) {
+      const body = document.getElementById("clients-body");
+      body.replaceChildren(...clients
+        .sort((a, b) => b.simulations - a.simulations)
+        .map(c => {
+          const arch = archByKey[c.archetype] || { label: c.archetype, color: "" };
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td></td>
+            <td class="login"></td>
+            <td><span class="tag"><span class="swatch" style="--arch-color: ${arch.color};"></span>${arch.label}</span></td>
+            <td class="num">${Math.round(c.budget_total).toLocaleString("fr-FR")} TND</td>
+            <td class="num">${c.simulations}</td>
+            <td class="num">${fmt(c.avg_final_trust)}</td>
+            <td class="num">${fmt(c.avg_final_intent)}</td>`;
+          tr.firstElementChild.textContent = c.name;  // names can come from the LLM generator or a real client
+          tr.querySelector(".login").textContent = c.login_email || "—";
+          if (c.is_twin) tr.firstElementChild.insertAdjacentHTML("beforeend", ' <span class="difficulty">Jumeau</span>');
+          return tr;
+        }));
+    }
+
+    document.querySelectorAll("[data-metric]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-metric]").forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+        renderMiniCharts(btn.dataset.metric);
+      });
+    });
+
+    async function loadDashboard() {
+      const status = document.getElementById("status-msg");
+      let user = null;
+      try { user = JSON.parse(localStorage.getItem("simulator_user")); } catch (e) {}
+      const authToken = localStorage.getItem("simulator_token");
+      if (!authToken) { window.location.href = "/"; return; }
+      if (user) document.getElementById("nav-user").textContent = user.full_name || user.email;
+
+      try {
+        const res = await fetch("/api/v1/admin/overview", { headers: { Authorization: `Bearer ${authToken}` } });
+        if (res.status === 401) {
+          localStorage.removeItem("simulator_token");
+          localStorage.removeItem("simulator_user");
+          window.location.href = "/";
+          return;
+        }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || res.statusText);
+        overview = data;
+        archByKey = Object.fromEntries(data.archetypes.map(a => [a.archetype, a]));
+
+        status.style.display = "none";
+        document.getElementById("dashboard").style.display = "flex";
+        renderKpis(data.totals);
+        renderArchetypeCards(data.archetypes, data.totals.clients);
+        renderMiniCharts("trust_level");
+        renderDailyChart(data.daily);
+        renderClients(data.clients);
+      } catch (err) {
+        status.textContent = "Erreur : " + err.message;
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

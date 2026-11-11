@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jasmin | Mon espace</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Marcellus&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg-dark: #f6f1e7;
+      --bg-card: #ffffff;
+      --accent-primary: #1f5fa8;
+      --accent-pale: #e9f1fb;
+      --text-main: #1e2a3a;
+      --text-secondary: #3b4a5c;
+      --text-muted: #5b6878;
+      --border-color: #e6dccb;
+      --grid-color: #efe8db;
+      --won: #2f7d4f;
+      --error: #b3261e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Figtree', system-ui, sans-serif; }
+    h1, h2, .brand-name { font-family: 'Marcellus', Georgia, serif; font-weight: 400; }
+    :focus-visible { outline: 3px solid var(--accent-primary); outline-offset: 2px; }
+    [hidden] { display: none !important; }
+
+    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
+
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+      padding: 1rem max(1rem, 2vw);
+      background: var(--bg-card); border-bottom: 3px solid var(--accent-primary);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit; }
+    .brand-name { font-size: 1.45rem; color: var(--accent-primary); line-height: 1.1; display: block; }
+    .brand small { display: block; color: var(--text-muted); font-size: 0.8rem; }
+    .nav-actions { display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 0.5rem 0.95rem; border-radius: 10px;
+      font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .btn:hover { border-color: var(--text-muted); }
+    .btn-bleu { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; padding: 0.8rem; font-size: 0.95rem; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 1.5rem max(1rem, 2vw) 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    main > *, .grid-2 > * { min-width: 0; }
+
+    h2 { font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    h2 i { color: var(--accent-primary); font-size: 1rem; }
+    .subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem; }
+    .section-head { margin-bottom: 1rem; }
+
+    /* Login */
+    .login { max-width: 420px; margin: 3rem auto; text-align: center; }
+    .login h1 { font-size: 2rem; color: var(--accent-primary); }
+    .login form { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.5rem; text-align: left; }
+    .login label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .champ { width: 100%; padding: 0.7rem 0.85rem; border: 1px solid var(--border-color); border-radius: 10px; font-size: 0.95rem; background: #fff; }
+    .erreur { color: var(--error); font-size: 0.85rem; }
+    .lien { display: block; margin-top: 1.25rem; color: var(--accent-primary); font-weight: 600; text-decoration: none; font-size: 0.9rem; }
+
+    /* Profile */
+    .profile { border-top: 4px solid var(--arch-color); }
+    .profile-head { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .tag { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+           background: var(--bg-dark); border-radius: 9999px; padding: 0.2rem 0.7rem; }
+    .swatch { width: 10px; height: 10px; border-radius: 50%; background: var(--arch-color); flex: none; }
+    .profile p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.6rem; }
+    .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+    .fact { font-size: 0.85rem; color: var(--text-muted); }
+    .fact b { display: block; color: var(--text-main); font-size: 0.95rem; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .kpi-value { font-size: 2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent-primary); }
+    .kpi-label { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+    .chart-box { position: relative; height: 260px; }
+
+    .grid-2 { display: grid; grid-template-columns: minmax(260px, 1fr) 2fr; gap: 1.5rem; align-items: start; }
+    @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .sim-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 560px; overflow-y: auto; }
+    .sim-item { text-align: left; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px;
+                padding: 0.7rem 0.85rem; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); }
+    .sim-item:hover { border-color: var(--text-muted); }
+    .sim-item[aria-current="true"] { border-color: var(--accent-primary); background: var(--accent-pale); }
+    .sim-item b { display: block; color: var(--text-main); font-size: 0.9rem; margin-bottom: 0.2rem; }
+    .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; border-radius: 9999px; padding: 0.1rem 0.5rem; margin-left: 0.35rem;
+             background: var(--bg-dark); color: var(--text-muted); }
+    .badge.won { background: #e3f2e8; color: var(--won); }
+
+    .transcript { display: flex; flex-direction: column; gap: 0.75rem; max-height: 560px; overflow-y: auto; padding-right: 0.25rem; }
+    .msg { max-width: 85%; padding: 0.7rem 0.9rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .msg small { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+    .msg.customer { align-self: flex-start; background: var(--bg-dark); }
+    .msg.rep { align-self: flex-end; background: var(--accent-pale); }
+    .empty { color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 2rem 0; }
+  </style>
+  <link rel="stylesheet" href="/static/ozone-twin.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="/espace" aria-label="Jasmin, mon espace">
+      <svg width="34" height="40" viewBox="0 0 40 48" aria-hidden="true">
+        <path d="M4 46V20a16 16 0 0 1 32 0v26z" fill="#1f5fa8"/>
+        <path d="M11 46V22a9 9 0 0 1 18 0v24z" fill="#ffffff"/>
+        <path d="M14 46V24a6 6 0 0 1 12 0v22z" fill="#1f5fa8" opacity="0.85"/>
+      </svg>
+      <span><span class="brand-name">Jasmin</span><small>Mon espace voyageur</small></span>
+    </a>
+    <a class="btn" id="nav-back" href="/" onclick="if (document.referrer.startsWith(location.origin) && history.length > 1) { history.back(); return false; }"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+    <div class="nav-actions" id="nav-actions" hidden>
+      <span id="nav-user" style="color: var(--text-muted);"></span>
+      <button class="btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Déconnexion</button>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Login -->
+    <section class="panel login" id="login-view" hidden>
+      <h1>Mon espace</h1>
+      <p class="subtitle">Retrouvez votre persona voyageur et les conversations simulées avec nos conseillers.</p>
+      <form id="login-form">
+        <div>
+          <label for="email">Email</label>
+          <input class="champ" type="email" id="email" autocomplete="username" required />
+        </div>
+        <div>
+          <label for="password">Mot de passe</label>
+          <input class="champ" type="password" id="password" autocomplete="current-password" required />
+        </div>
+        <div class="erreur" id="login-error" role="alert" hidden></div>
+        <button class="btn btn-bleu" type="submit" id="login-btn"><i class="fa-solid fa-arrow-right-to-bracket"></i> Se connecter</button>
+      </form>
+      <a class="lien" href="/questionnaire"><i class="fa-solid fa-suitcase-rolling"></i> Pas encore de profil ? Créez votre persona</a>
+      <a class="lien" href="/"><i class="fa-solid fa-arrow-left"></i> Retour à l'accueil</a>
+    </section>
+
+    <div id="status-msg" class="empty" hidden></div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" hidden style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <section class="panel profile" id="profile"></section>
+      <section class="kpi-grid" id="kpis"></section>
+
+      <section class="panel">
+        <div class="section-head">
+          <h2><i class="fa-solid fa-chart-line"></i> Évolution de vos simulations</h2>
+          <p class="subtitle">Confiance et intention de réserver de votre persona à la fin de chaque conversation (sur 10)</p>
+        </div>
+        <div class="chart-box"><canvas id="chart" role="img" aria-label="Courbes de la confiance et de l'intention finales par simulation"></canvas></div>
+      </section>
+
+      <div class="grid-2">
+        <section class="panel">
+          <div class="section-head">
+            <h2><i class="fa-solid fa-comments"></i> Conversations</h2>
+            <p class="subtitle" id="sims-subtitle"></p>
+          </div>
+          <div class="sim-list" id="sim-list"></div>
+        </section>
+        <section class="panel">
+          <div class="section-head">
+            <h2 id="transcript-title"><i class="fa-solid fa-message"></i> Conversation</h2>
+            <p class="subtitle" id="transcript-subtitle">Choisissez une conversation à gauche.</p>
+          </div>
+          <div class="transcript" id="transcript"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const STAGES = { greetings: "Accueil", needs_discovery: "Découverte des besoins", recommendation: "Recommandation",
+                     objection_handling: "Objections", negotiation: "Négociation", closing: "Conclusion" };
+    const token = () => localStorage.getItem("simulator_token");
+    const fmt = v => v == null ? "—" : Number(v).toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+    const fmtDate = iso => new Date(iso + (iso.endsWith("Z") ? "" : "Z")).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
+    const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+    async function api(path) {
+      const res = await fetch(path, { headers: { Authorization: `Bearer ${token()}` } });
+      if (res.status === 401 || res.status === 403) { clearSession(); showLogin(res.status === 403 ? "Ce compte n'est pas un compte client." : ""); return null; }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || res.statusText);
+      return data;
+    }
+
+    function clearSession() {
+      localStorage.removeItem("simulator_token");
+      localStorage.removeItem("simulator_user");
+    }
+
+    function showLogin(message = "") {
+      document.getElementById("login-view").hidden = false;
+      document.getElementById("dashboard").hidden = true;
+      document.getElementById("nav-actions").hidden = true;
+      document.getElementById("nav-back").hidden = false;
+      const err = document.getElementById("login-error");
+      err.textContent = message;
+      err.hidden = !message;
+    }
+
+    function logout() {
+      if (token()) fetch("/api/v1/auth/logout", { method: "POST", headers: { Authorization: `Bearer ${token()}` } }).catch(() => {});
+      clearSession();
+      showLogin();
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const btn = document.getElementById("login-btn");
+      btn.disabled = true;
+      try {
+        const res = await fetch("/api/v1/auth/login", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: document.getElementById("email").value.trim(), password: document.getElementById("password").value })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Connexion impossible.");
+        if (data.user.role !== "client") {  // advisors and admins go back to the simulator
+          localStorage.setItem("simulator_token", data.access_token);
+          localStorage.setItem("simulator_user", JSON.stringify(data.user));
+          window.location.href = "/";
+          return;
+        }
+        localStorage.setItem("simulator_token", data.access_token);
+        localStorage.setItem("simulator_user", JSON.stringify(data.user));
+        await loadDashboard();
+      } catch (err) {
+        showLogin(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function renderProfile(p) {
+      const box = document.getElementById("profile");
+      box.style.setProperty("--arch-color", p.archetype_color);
+      const head = el("div", "profile-head");
+      head.append(el("h2", null, p.name));
+      const tag = el("span", "tag");
+      tag.append(el("span", "swatch"), p.archetype_label);
+      head.append(tag);
+      const dates = p.travel_dates || {};
+      const facts = el("div", "facts");
+      [["Destination", (p.destinations || []).join(", ") || "—"],
+       ["Dates", dates.start_date ? `${new Date(dates.start_date).toLocaleDateString("fr-FR")} → ${new Date(dates.end_date).toLocaleDateString("fr-FR")}` : "—"],
+       ["Voyageurs", p.travelers],
+       ["Budget", `${Math.round(p.budget_total).toLocaleString("fr-FR")} TND`]]
+        .forEach(([label, value]) => { const f = el("div", "fact", label); f.prepend(el("b", null, value)); facts.append(f); });
+      box.replaceChildren(head, el("p", null, p.archetype_description), facts);
+    }
+
+    function renderKpis(s) {
+      document.getElementById("kpis").replaceChildren(...[
+        [s.simulations, "Conversations simulées"],
+        [s.won, "Réservations obtenues"],
+        [fmt(s.avg_trust), "Confiance moyenne /10"],
+        [fmt(s.avg_intent), "Intention moyenne /10"],
+      ].map(([v, label]) => { const c = el("div", "panel"); c.append(el("div", "kpi-value", v), el("div", "kpi-label", label)); return c; }));
+    }
+
+    let chart = null;
+    function renderChart(sims) {
+      const ordered = [...sims].reverse();  // oldest first
+      chart?.destroy();
+      chart = new Chart(document.getElementById("chart"), {
+        type: "line",
+        data: {
+          labels: ordered.map((s, i) => `#${i + 1}`),
+          datasets: [
+            { label: "Confiance", data: ordered.map(s => s.trust_level), borderColor: "#1f5fa8", backgroundColor: "#1f5fa8", tension: 0.3 },
+            { label: "Intention de réserver", data: ordered.map(s => s.booking_intention), borderColor: "#c8702a", backgroundColor: "#c8702a", tension: 0.3 },
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { y: { min: 0, max: 10, grid: { color: "#efe8db" } }, x: { grid: { display: false } } },
+          plugins: {
+            legend: { position: "top", align: "start", labels: { usePointStyle: true } },
+            tooltip: { callbacks: { title: items => fmtDate(ordered[items[0].dataIndex].created_at) } }
+          }
+        }
+      });
+    }
+
+    function renderSimList(sims) {
+      document.getElementById("sims-subtitle").textContent = sims.length
+        ? `${sims.length} conversation(s), la plus récente en premier` : "";
+      const list = document.getElementById("sim-list");
+      if (!sims.length) {
+        list.replaceChildren(el("div", "empty", "Aucune conversation pour l'instant : un conseiller n'a pas encore simulé d'échange avec votre persona."));
+        return;
+      }
+      list.replaceChildren(...sims.map(s => {
+        const b = el("button", "sim-item");
+        b.type = "button";
+        b.dataset.id = s.id;
+        const title = el("b", null, fmtDate(s.created_at));
+        title.append(el("span", s.won ? "badge won" : "badge", s.outcome_label || (s.won ? "Réservé" : (s.status === "completed" ? "Terminée" : "En cours"))));
+        b.append(title, `${s.hotel || "Sans hôtel"} · ${s.messages} messages · ${s.language === "en" ? "English" : "Français"}`);
+        b.addEventListener("click", () => openSimulation(s.id));
+        return b;
+      }));
+    }
+
+    async function openSimulation(id) {
+      document.querySelectorAll(".sim-item").forEach(b => b.setAttribute("aria-current", String(b.dataset.id === id)));
+      const box = document.getElementById("transcript");
+      box.replaceChildren(el("div", "empty", "Chargement..."));
+      try {
+        const sim = await api(`/api/v1/me/simulations/${encodeURIComponent(id)}`);
+        if (!sim) return;
+        document.getElementById("transcript-subtitle").textContent =
+          `${sim.hotel || "Sans hôtel"} · étape : ${STAGES[sim.stage] || sim.stage} · confiance ${fmt(sim.trust_level)}/10 · intention ${fmt(sim.booking_intention)}/10`
+          + (sim.outcome_label ? ` · issue : ${sim.outcome_label}${sim.outcome_reason ? ` (${sim.outcome_reason})` : ""}` : "");
+        box.replaceChildren(...sim.transcript.map(m => {
+          const isCustomer = m.sender === "customer";
+          const bubble = el("div", "msg " + (isCustomer ? "customer" : "rep"), m.content);  // textContent: LLM output never parsed as HTML
+          bubble.prepend(el("small", null, isCustomer ? "Votre persona" : "Conseiller Jasmin"));
+          return bubble;
+        }));
+      } catch (err) {
+        box.replaceChildren(el("div", "empty", "Erreur : " + err.message));
+      }
+    }
+
+    async function loadDashboard() {
+      const status = document.getElementById("status-msg");
+      if (!token()) { showLogin(); return; }
+      try {
+        const data = await api("/api/v1/me/dashboard");
+        if (!data) return;
+        document.getElementById("login-view").hidden = true;
+        status.hidden = true;
+        document.getElementById("dashboard").hidden = false;
+        document.getElementById("nav-actions").hidden = false;
+        document.getElementById("nav-back").hidden = true;
+        document.getElementById("nav-user").textContent = data.profile.name;
+        renderProfile(data.profile);
+        renderKpis(data.stats);
+        renderChart(data.simulations);
+        renderSimList(data.simulations);
+        if (data.simulations.length) openSimulation(data.simulations[0].id);
+      } catch (err) {
+        status.textContent = "Erreur : " + err.message;
+        status.hidden = false;
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
