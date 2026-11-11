@@ -14,7 +14,8 @@ Callverse is an end-to-end multi-agent customer-service platform. It brings toge
 
 | Folder | Implementation |
 | --- | --- |
-| `platform/` | Digital Twin platform and Marketing Agent implementation |
+| `platform/` | Digital Twin platform and shared integration layer |
+| `marketing-agent/` | Marketing Agent backend services and dashboard implementation |
 | `customer-advisor/` | Amira customer advisor interface, voice listener and scenario library |
 | `jasmin-client-simulator/` | Jasmin personas, client simulator and conversation engine |
 | `quality-analyst/` | Quality scoring, evidence review and analyst services |

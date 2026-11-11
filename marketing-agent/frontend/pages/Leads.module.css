@@ -1,0 +1,119 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+.modeBar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .5rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-card); }
+.modeBar button { background: transparent; color: var(--text-muted); }.modeBar .activeMode { background: var(--primary); color: white; }.modeBar span { color: var(--text-muted); font-size: .75rem; padding-right: .5rem; }
+.demoBadge { color: #8a5b00; background: #fff0b8; border-radius: 999px; padding: .18rem .45rem; font-size: .65rem; font-weight: 800; letter-spacing: .08em; }
+
+.activeFilter {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.author {
+  font-size: 0.9rem;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.confidence {
+  background: var(--border);
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-inline-start: auto;
+}
+
+.message {
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.sourceCaption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-left: 3px solid var(--border);
+  padding-left: 0.5rem;
+}
+
+.sourceLabel {
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.leadBtn {
+  font-size: 0.8rem;
+}
+
+.ignoreBtn {
+  font-size: 0.8rem;
+}
+
+.saleForm {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
